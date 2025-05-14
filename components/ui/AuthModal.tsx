@@ -1,7 +1,7 @@
 "use client"
-
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { signIn } from 'next-auth/react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -16,21 +16,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
-    // Handle authentication logic here
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     console.log({ isLogin, email, password, fullName });
   };
 
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto">
       <div className="fixed inset-0 bg-black/70" onClick={onClose} />
-      
+
       <div className="relative min-h-screen flex items-center justify-center p-4">
         <div className="relative bg-white w-full max-w-md rounded-lg shadow-2xl overflow-hidden">
           {/* Left black accent bar */}
           <div className="absolute left-0 top-0 bottom-0 w-2 bg-black"></div>
-          
-          <button 
+
+          <button
             onClick={onClose}
             className="absolute right-4 top-4 text-gray-400 hover:text-black transition-colors duration-200"
           >
@@ -48,7 +48,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
 
             {/* Google Login Button */}
-            <button 
+            <button onClick={() => signIn("google", { callbackUrl: "/" })}
               className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-md py-3 px-4 mb-6 font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18" height="18">
@@ -117,7 +117,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               )}
 
               <button
-                onClick={handleSubmit}
+                onClick={(e) => handleSubmit(e)}
                 className="w-full bg-black text-white rounded-md py-3 font-medium hover:bg-gray-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-black"
               >
                 {isLogin ? 'Sign in' : 'Create account'}
