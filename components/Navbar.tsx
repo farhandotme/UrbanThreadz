@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Search, ShoppingCart, User, Heart, Menu, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import AuthModal from '@/components/ui/AuthModal';
+import { useSession, signOut } from 'next-auth/react'; // Removed incorrect 'user' import
+import Image from 'next/image';
 
 
 export default function TshirtEcomNavbar() {
@@ -13,6 +15,7 @@ export default function TshirtEcomNavbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   // This will handle client-side hydration
   const [isMounted, setIsMounted] = useState(false);
 
@@ -23,7 +26,10 @@ export default function TshirtEcomNavbar() {
     { id: 3, name: 'Shop By', subcategories: ['Men', 'Women', 'Unisex'], path: '/shop-by' },
     { id: 4, name: 'Sale', subcategories: ['Clearance', 'Bundle Deals'], path: '/sale' },
   ];
-
+  
+  // Proper session usage
+  const { data: session, status } = useSession();
+  
   // Handle client-side hydration
   useEffect(() => {
     setIsMounted(true);
@@ -51,20 +57,34 @@ export default function TshirtEcomNavbar() {
   useEffect(() => {
     if (!isMounted) return;
 
-    const handleClickOutside = () => {
+    const handleClickOutside = (event: MouseEvent) => {
+      // Close category dropdown
       setActiveCategory(null);
+      
+      // Close profile dropdown if clicking outside
+      if (showProfileMenu && event.target instanceof Element && !event.target.closest('.profile-dropdown')) {
+        setShowProfileMenu(false);
+      }
     };
 
     document.addEventListener('click', handleClickOutside);
     return () => {
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [isMounted]);
+  }, [isMounted, showProfileMenu]);
 
   // Toggle dropdown without stopping propagation for Link
   const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>, categoryId: number) => {
     e.stopPropagation(); // Stop propagation only for the dropdown toggle
     setActiveCategory(activeCategory === categoryId ? null : categoryId);
+  };
+  
+  // Handle sign out function
+  const handleSignOut = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setShowProfileMenu(false);
+    await signOut({ redirect: false });
+    // You could add additional actions after signout here
   };
 
   // If not mounted yet (server-side), render a simpler version to avoid hydration mismatch
@@ -218,10 +238,64 @@ export default function TshirtEcomNavbar() {
               <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">2</span>
             </Link>
 
-            {/* Account */}
-            <button onClick={() => setIsAuthModalOpen(true)} className="text-gray-700 hover:text-black transition-colors">
-              <User size={20} />
-            </button>
+            {/* Account - Fixed User Authentication Display */}
+            <div className="relative profile-dropdown">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (status === "authenticated" && session?.user) {
+                    setShowProfileMenu(!showProfileMenu);
+                  } else {
+                    setIsAuthModalOpen(true);
+                  }
+                }} 
+                className="text-gray-700 hover:text-black transition-colors flex items-center"
+              >
+                {status === "authenticated" && session?.user ? (
+                  <div className="relative">
+                    <Image
+                      src={session.user.image || "/default-avatar.png"}
+                      alt={session.user.name || "User"}
+                      className="rounded-full"
+                      width={24}
+                      height={24}
+                    />
+                  </div>
+                ) : (
+                  <User size={20} />
+                )}
+              </button>
+              
+              {/* Profile Dropdown Menu */}
+              {showProfileMenu && status === "authenticated" && session?.user && (
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-1 z-50 border border-gray-200">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">{session.user.name || "User"}</p>
+                    <p className="text-xs text-gray-500 truncate">{session.user.email || ""}</p>
+                  </div>
+                  <Link 
+                    href="/profile" 
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setShowProfileMenu(false)}
+                  >
+                    Your Profile
+                  </Link>
+                  <Link 
+                    href="/orders" 
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setShowProfileMenu(false)}
+                  >
+                    Your Orders
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Cart */}
             <Link href="/cart" className="text-gray-700 hover:text-black transition-colors relative">
@@ -294,10 +368,68 @@ export default function TshirtEcomNavbar() {
               </span>
             </Link>
 
-            {/* Account */}
-            <button onClick={() => setIsAuthModalOpen(true)} className="text-gray-700 hover:text-black transition-colors">
-              <User size={20} />
-            </button>
+            {/* Account - Mobile Menu Fix */}
+            <div className="relative profile-dropdown">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (status === "authenticated" && session?.user) {
+                    setShowProfileMenu(!showProfileMenu);
+                  } else {
+                    setIsAuthModalOpen(true);
+                  }
+                }}
+                className="text-gray-700 hover:text-black transition-colors"
+              >
+                {status === "authenticated" && session?.user ? (
+                  <Image
+                    src={session.user.image || "/default-avatar.png"}
+                    alt={session.user.name || "User"}
+                    className="rounded-full"
+                    width={32}
+                    height={32}
+                  />
+                ) : (
+                  <User size={20} />
+                )}
+              </button>
+              
+              {/* Mobile Profile Dropdown */}
+              {showProfileMenu && status === "authenticated" && session?.user && (
+                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-1 z-50 border border-gray-200">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900">{session.user.name || "User"}</p>
+                    <p className="text-xs text-gray-500 truncate">{session.user.email || ""}</p>
+                  </div>
+                  <Link 
+                    href="/profile" 
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Your Profile
+                  </Link>
+                  <Link 
+                    href="/orders" 
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => {
+                      setShowProfileMenu(false); 
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Your Orders
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Cart */}
             <Link href="/cart" className="text-gray-700 hover:text-black transition-colors relative">
