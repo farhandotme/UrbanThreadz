@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/DB/dbConfig";
 import userModels from "@/models/userModels";
-
+import jwt from "jsonwebtoken";
 connectDB();
 
 export async function POST(request: Request) {
@@ -15,7 +15,9 @@ export async function POST(request: Request) {
     if (existingUser) {
       return NextResponse.json(
         { message: "Email already registered" },
-        { status: 400 }
+        {
+          status: 409,
+        }
       );
     }
     // Hash password
@@ -28,20 +30,25 @@ export async function POST(request: Request) {
       password: hashedPassword,
     });
 
-    return NextResponse.json(
-      { message: "User registered successfully", newUser },
+    // Create JWT token
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET!, {
+      expiresIn: "1d",
+    });
+
+    // Send JWT token in response
+    const response = NextResponse.json(
+      { message: "User registered successfully", token },
       { status: 201 }
     );
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    });
+    return response;
   } catch (error) {
-    console.error("🔴 Registration error:", error);
-    console.error(
-      "🧪 Full error details:",
-      JSON.stringify(error, Object.getOwnPropertyNames(error))
-    );
-
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
+    if (error instanceof Error) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
   }
 }

@@ -13,7 +13,6 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
-// Define separate schemas for login and registration
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
@@ -26,15 +25,12 @@ const registerSchema = z.object({
     .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/, "Password must contain at least one letter and one number"),
 });
 
-// Create types from schemas
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  // Track the current auth mode
   const [isLogin, setIsLogin] = useState(true);
 
-  // Initialize forms outside of render function to avoid recreation on each render
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -52,55 +48,54 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     },
   });
 
-  // Don't render the modal if it's not open
   if (!isOpen) return null;
 
-  // Handle login submission
-  const onLoginSubmit: SubmitHandler<LoginFormValues> = (data) => {
-    console.log("Login data:", data);
-    signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      callbackUrl: "/"
-    });
+  const onLoginSubmit: SubmitHandler<LoginFormValues> = async (data) => {
+    try {
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error(result.error);
+      } else {
+        toast.success('Logged in successfully!');
+        onClose();
+      }
+    } catch {
+      toast.error('An error occurred');
+    }
   };
 
-  // Handle registration submission
-  const onRegisterSubmit: SubmitHandler<RegisterFormValues> = async (data, e) => {
-    e!.preventDefault();
-    console.log("Register data:", data);
+  const onRegisterSubmit: SubmitHandler<RegisterFormValues> = async (data) => {
     try {
       const response = await axios.post("/api/users/register", {
         fullname: data.fullname,
         email: data.email,
         password: data.password,
       });
+
       if (response.status === 201) {
-        toast.success("Registration successful!");
-        setTimeout(() => {
-          onClose();
-        }, 1000);
-        registerForm.reset();
+        toast.success('Registration successful! Please sign in.');
+        setIsLogin(true);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        const errorMessage = error.response?.data?.message || "Registration failed";
-        toast.error(errorMessage);
+        toast.error(error.response?.data?.message || 'Registration failed');
       } else {
-        toast.error("Network error occurred");
+        toast.error('An unexpected error occurred');
       }
-      console.error("Registration error:", error);
     }
   };
 
-  // Toggle between login and register
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
     loginForm.reset();
     registerForm.reset();
   };
 
-  // Render the appropriate form based on auth mode
   const renderForm = () => {
     if (isLogin) {
       return (
