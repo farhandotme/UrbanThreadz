@@ -62,7 +62,9 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         toast.error(result.error);
       } else {
         toast.success('Logged in successfully!');
-        onClose();
+        setTimeout(() => {
+          onClose();
+        }, 500);
       }
     } catch {
       toast.error('An error occurred');
@@ -78,8 +80,21 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       });
 
       if (response.status === 201) {
-        toast.success('Registration successful! Please sign in.');
-        setIsLogin(true);
+        // Auto sign in after registration
+        const result = await signIn('credentials', {
+          email: data.email,
+          password: data.password,
+          redirect: false,
+        });
+
+        if (result?.error) {
+          toast.error(result.error);
+        } else {
+          toast.success('Registration successful!');
+          setTimeout(() => {
+            onClose();
+          }, 500);
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
