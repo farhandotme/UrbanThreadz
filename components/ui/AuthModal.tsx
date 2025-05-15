@@ -2,23 +2,213 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import { useForm, SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from 'zod';
+import { Toaster, toast } from 'sonner';
+import axios from 'axios';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+// Define separate schemas for login and registration
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
+const registerSchema = z.object({
+  fullname: z.string().min(3, "Name must be at least 3 characters").max(50, "Name is too long"),
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters")
+    .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/, "Password must contain at least one letter and one number"),
+});
+
+// Create types from schemas
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
+
+export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+  // Track the current auth mode
+  const [isLogin, setIsLogin] = useState(true);
+
+  // Initialize forms outside of render function to avoid recreation on each render
+  const loginForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const registerForm = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      fullname: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  // Don't render the modal if it's not open
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log({ isLogin, email, password, fullName });
+  // Handle login submission
+  const onLoginSubmit: SubmitHandler<LoginFormValues> = (data) => {
+    console.log("Login data:", data);
+    signIn("credentials", {
+      email: data.email,
+      password: data.password,
+      callbackUrl: "/"
+    });
+  };
+
+  // Handle registration submission
+  const onRegisterSubmit: SubmitHandler<RegisterFormValues> = async (data, e) => {
+    e!.preventDefault();
+    console.log("Register data:", data);
+    try {
+      const response = await axios.post("/api/users/register", {
+        fullname: data.fullname,
+        email: data.email,
+        password: data.password,
+      });
+      if (response.status === 201) {
+        toast.success("Registration successful!");
+        setTimeout(() => {
+          onClose();
+        }, 1000);
+        registerForm.reset();
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage = error.response?.data?.message || "Registration failed";
+        toast.error(errorMessage);
+      } else {
+        toast.error("Network error occurred");
+      }
+      console.error("Registration error:", error);
+    }
+  };
+
+  // Toggle between login and register
+  const toggleAuthMode = () => {
+    setIsLogin(!isLogin);
+    loginForm.reset();
+    registerForm.reset();
+  };
+
+  // Render the appropriate form based on auth mode
+  const renderForm = () => {
+    if (isLogin) {
+      return (
+        <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              {...loginForm.register("email")}
+              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+            />
+            {loginForm.formState.errors.email && (
+              <p className="mt-1 text-sm text-red-600">{loginForm.formState.errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Your password"
+              {...loginForm.register("password")}
+              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+            />
+            {loginForm.formState.errors.password && (
+              <p className="mt-1 text-sm text-red-600">{loginForm.formState.errors.password.message}</p>
+            )}
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="text-sm text-gray-600 hover:text-black transition-colors"
+            >
+              Forgot password?
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-black text-white rounded-md py-3 font-medium hover:bg-gray-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-black"
+          >
+            Sign in
+          </button>
+        </form>
+      );
+    } else {
+      return (
+        <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Full Name
+            </label>
+            <input
+              type="text"
+              placeholder="John Doe"
+              {...registerForm.register("fullname")}
+              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+            />
+            {registerForm.formState.errors.fullname && (
+              <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.fullname.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              {...registerForm.register("email")}
+              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+            />
+            {registerForm.formState.errors.email && (
+              <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Password
+            </label>
+            <input
+              type="password"
+              placeholder="Create a password"
+              {...registerForm.register("password")}
+              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+            />
+            {registerForm.formState.errors.password && (
+              <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.password.message}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-black text-white rounded-md py-3 font-medium hover:bg-gray-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-black"
+          >
+            Create account
+          </button>
+        </form>
+      );
+    }
   };
 
   return (
@@ -48,8 +238,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </div>
 
             {/* Google Login Button */}
-            <button onClick={() => signIn("google", { callbackUrl: "/" })}
+            <button
+              onClick={() => signIn("google", { callbackUrl: "/" })}
               className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-md py-3 px-4 mb-6 font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              type="button"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18" height="18">
                 <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12s5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
@@ -66,69 +258,15 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <div className="flex-1 h-px bg-gray-200"></div>
             </div>
 
-            <div className="space-y-5">
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
-                />
-              </div>
-
-              {isLogin && (
-                <div className="flex justify-end">
-                  <button className="text-sm text-gray-600 hover:text-black transition-colors">
-                    Forgot password?
-                  </button>
-                </div>
-              )}
-
-              <button
-                onClick={(e) => handleSubmit(e)}
-                className="w-full bg-black text-white rounded-md py-3 font-medium hover:bg-gray-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-black"
-              >
-                {isLogin ? 'Sign in' : 'Create account'}
-              </button>
-            </div>
+            {/* Render the appropriate form based on current auth mode */}
+            {renderForm()}
           </div>
 
           <div className="bg-gray-50 px-8 py-4 text-center">
             <button
+              type="button"
               className="text-sm text-gray-600 hover:text-black transition-colors"
-              onClick={() => setIsLogin(!isLogin)}
+              onClick={toggleAuthMode}
             >
               {isLogin ? "Don't have an account? " : 'Already have an account? '}
               <span className="font-semibold">
@@ -138,6 +276,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }
