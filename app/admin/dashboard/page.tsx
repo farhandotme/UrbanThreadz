@@ -38,7 +38,7 @@ export default function AdminDashboard() {
       title: "Total Products",
       value: 0,
       icon: <Package className="w-8 h-8 text-purple-600" />,
-      link: "/admin/products",
+      link: "/admin/dashboard/products",
     },
     {
       title: "Total Customers",

@@ -44,7 +44,7 @@ const productSchema = z.object({
       value: z.string().min(1, "Tag cannot be empty"),
     })
   ),
-  isAvailable: z.boolean().default(true),
+  isAvailable: z.boolean(), // Make required
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -62,7 +62,7 @@ export default function AddNewProduct() {
     formState: { errors },
     getValues,
     setValue,
-  } = useForm<ProductFormValues>({
+  } = useForm<ProductFormValues>({ // Explicitly set generic
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
@@ -116,7 +116,7 @@ export default function AddNewProduct() {
   };
 
   const handleImageUpload = useCallback(
-    (index: number, info?: any) => {
+    (index: number, info?: { info?: { secure_url: string } }) => {
       if (info?.info?.secure_url) {
         setValue(`images.${index}.url`, info.info.secure_url);
 
@@ -254,11 +254,26 @@ export default function AddNewProduct() {
                     {getValues(`images.${index}.url`) ? (
                       <div className="relative group">
                         <div className="w-full aspect-square bg-gray-100 rounded-md overflow-hidden">
-                          <img
-                            src={getValues(`images.${index}.url`)}
-                            alt="Product preview"
-                            className="w-full h-full object-cover"
-                          />
+                          {getValues(`images.${index}.url`) ? (
+                            <Image
+                              src={getValues(`images.${index}.url`)}
+                              alt="Product preview"
+                              width={300}
+                              height={300}
+                              className="w-full h-full object-cover bg-white rounded-md"
+                              style={{ backgroundColor: '#fff', minHeight: 0, minWidth: 0 }}
+                              onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/300x300?text=No+Image';
+                                (e.target as HTMLImageElement).className = 'w-full h-full object-contain bg-gray-100 rounded-md';
+                              }}
+                              unoptimized
+                              priority
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-100 rounded-md">
+                              No Image
+                            </div>
+                          )}
                         </div>
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all rounded-md flex items-center justify-center">
                           <div className="opacity-0 group-hover:opacity-100 transition-all flex space-x-2">
