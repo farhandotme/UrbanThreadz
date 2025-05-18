@@ -1,20 +1,19 @@
 "use client"
-
-import { useState } from "react"
-import { useForm, useFieldArray, SubmitHandler } from "react-hook-form"
+import { useState, useCallback, useEffect } from "react"
+import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { Plus, X } from "lucide-react"
 import { toast } from "sonner"
+import { CldUploadWidget } from "next-cloudinary"
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required").max(100),
-  sku: z.string().min(1, "SKU is required"),
   images: z.array(z.object({
     url: z.string().min(1, "Image URL is required"),
     alt: z.string().optional(),
-    isMain: z.boolean().default(false)
-  })).min(1, "At least one image is required"),
+    isMain: z.boolean()
+  })).min(1, { message: "At least one image is required" }),
   realPrice: z.number().min(0, "Price cannot be negative"),
   discountedPrice: z.number().min(0, "Price cannot be negative")
     .refine((val) => val >= 0, "Discounted price must be positive"),
@@ -25,52 +24,68 @@ const productSchema = z.object({
     stock: z.number().min(0, "Stock cannot be negative")
   })).min(1, "At least one size is required"),
   category: z.string().min(1, "Category is required"),
-  tags: z.array(z.string().min(1, "Tag cannot be empty")),
+  tags: z.array(z.object({
+    value: z.string().min(1, "Tag cannot be empty")
+  })),
   isAvailable: z.boolean().default(true)
 })
-
 type ProductFormValues = z.infer<typeof productSchema>
-
 export default function AddNewProduct() {
   const [isSubmitting, setIsSubmitting] = useState(false)
-
   const {
     register,
     handleSubmit,
     control,
-    formState: { errors }
+    formState: { errors },
+    watch,
+    setError,
+    clearErrors,
+    getValues,
+    setValue
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      images: [{ url: "", alt: "", isMain: true }],
+      name: "",
+      images: [{ url: "", alt: "", isMain: false }],
+      realPrice: 0,
+      discountedPrice: 0,
+      description: "",
+      shortDescription: "",
       sizes: [{ name: "M", stock: 0 }],
-      tags: [""],
+      category: "",
+      tags: [{ value: "" }],
       isAvailable: true
     }
   })
-
-  const { fields: imageFields, append: appendImage, remove: removeImage } = 
+  const { fields: imageFields, append: appendImage, remove: removeImage } =
     useFieldArray({ control, name: "images" })
-  
-  const { fields: sizeFields, append: appendSize, remove: removeSize } = 
+  const { fields: sizeFields, append: appendSize, remove: removeSize } =
     useFieldArray({ control, name: "sizes" })
-  
-  const { fields: tagFields, append: appendTag, remove: removeTag } = 
+  const { fields: tagFields, append: appendTag, remove: removeTag } =
     useFieldArray({ control, name: "tags" })
-
-
-  const onSubmit: SubmitHandler<ProductFormValues> = async (data) => {
+  const Submit = async (data: ProductFormValues, e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     try {
       setIsSubmitting(true)
-      
       if (data.discountedPrice > data.realPrice) {
-        toast.error("Discounted price cannot be greater than real price")
+        setError("discountedPrice", {
+          type: "manual",
+          message: "Discounted price cannot be greater than real price"
+        })
+        setIsSubmitting(false)
         return
       }
-
+      const mainImageCount = data.images.filter(img => img.isMain).length
+      if (mainImageCount !== 1) {
+        setError("images", {
+          type: "manual",
+          message: "Exactly one image must be set as main"
+        })
+        setIsSubmitting(false)
+        return
+      }
       console.log(data)
       toast.success("Product created successfully!")
-      
     } catch (error) {
       toast.error("Failed to create product")
       console.error(error)
@@ -78,14 +93,33 @@ export default function AddNewProduct() {
       setIsSubmitting(false)
     }
   }
+  // console.log("Form values:", watch())
+  const realPrice = watch("realPrice")
+  const discountedPrice = watch("discountedPrice")
 
+  useEffect(() => {
+    if (discountedPrice > realPrice) {
+      setError("discountedPrice", {
+        type: "manual",
+        message: "Discounted price cannot be greater than real price"
+      })
+    } else {
+      clearErrors("discountedPrice")
+    }
+  }, [realPrice, discountedPrice, setError, clearErrors])
+
+  const handleImageUpload = useCallback((index: number, info?: any) => {
+    if (info?.info?.secure_url) {
+      setValue(`images.${index}.url`, info.info.secure_url)
+    }
+  }, [setValue])
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-6">Add New Product</h1>
-          
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+
+          <form className="space-y-6">
             {/* Basic Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -99,20 +133,6 @@ export default function AddNewProduct() {
                 />
                 {errors.name && (
                   <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  SKU
-                </label>
-                <input
-                  type="text"
-                  {...register("sku")}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-                />
-                {errors.sku && (
-                  <p className="mt-1 text-sm text-red-600">{errors.sku.message}</p>
                 )}
               </div>
             </div>
@@ -157,20 +177,43 @@ export default function AddNewProduct() {
               </label>
               {imageFields.map((field, index) => (
                 <div key={field.id} className="flex items-center space-x-4 mb-2">
-                  <input
-                    {...register(`images.${index}.url`)}
-                    placeholder="Image URL"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-                  />
-                  <input
-                    {...register(`images.${index}.alt`)}
-                    placeholder="Alt text"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
-                  />
+                  <CldUploadWidget
+                    onSuccess={(info) => handleImageUpload(index, info)}
+                    uploadPreset="UrbanThreadz"
+                    options={{
+                      maxFiles: 1,
+                      maxFileSize: 10 * 1024 * 1024, // 10 MB
+                      cropping: false,
+                      sources: ["local"],
+                      resourceType: "image",
+                      clientAllowedFormats: ["jpg", "png", "jpeg", "webp"]
+                    }}
+                  >
+                    {({ open }) => (
+                      <button
+                        type="button"
+                        onClick={() => open()}
+                        className="px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                      >
+                        Upload
+                      </button>
+                    )}
+                  </CldUploadWidget>
                   <input
                     type="checkbox"
                     {...register(`images.${index}.isMain`)}
                     className="ml-2"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        const currentValues = getValues();
+
+                        currentValues.images.forEach((_, i) => {
+                          if (i !== index) {
+                            setValue(`images.${i}.isMain`, false);
+                          }
+                        });
+                      }
+                    }}
                   />
                   <span className="text-xs text-gray-600">Main</span>
                   <button
@@ -282,7 +325,7 @@ export default function AddNewProduct() {
                 {tagFields.map((field, index) => (
                   <div key={field.id} className="flex items-center space-x-2 mb-2">
                     <input
-                      {...register(`tags.${index}`)}
+                      {...register(`tags.${index}.value`)}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black"
                     />
                     <button
@@ -296,7 +339,7 @@ export default function AddNewProduct() {
                 ))}
                 <button
                   type="button"
-                  onClick={() => appendTag("")}
+                  onClick={() => appendTag({ value: "" })}
                   className="mt-2 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   <Plus size={20} className="mr-2" />
@@ -305,8 +348,22 @@ export default function AddNewProduct() {
               </div>
             </div>
 
+            {/* Availability */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="isAvailable"
+                {...register("isAvailable")}
+                className="h-4 w-4 text-black focus:ring-black border-gray-300 rounded"
+              />
+              <label htmlFor="isAvailable" className="ml-2 block text-sm text-gray-900">
+                Product Available for Sale
+              </label>
+            </div>
+
             {/* Submit Button */}
             <button
+              onClick={handleSubmit((data, e) => Submit(data, e as React.FormEvent<HTMLFormElement>))}
               type="submit"
               disabled={isSubmitting}
               className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black disabled:opacity-50 disabled:cursor-not-allowed"

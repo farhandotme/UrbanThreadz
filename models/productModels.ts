@@ -13,8 +13,6 @@ interface ProductSize {
 
 interface Product extends Document {
   name: string;
-  slug: string;
-  sku: string;
   images: ProductImage[];
   realPrice: number;
   discountedPrice: number;
@@ -38,16 +36,6 @@ const productSchema = new Schema<Product>(
       required: [true, "Product name is required"],
       trim: true,
       maxlength: [100, "Product name cannot exceed 100 characters"],
-    },
-    slug: {
-      type: String,
-      unique: true,
-      lowercase: true,
-    },
-    sku: {
-      type: String,
-      required: [true, "SKU is required"],
-      unique: true,
     },
     images: [
       {
@@ -135,14 +123,6 @@ const productSchema = new Schema<Product>(
     toObject: { virtuals: true },
   }
 );
-
-// Middleware to generate slug from name
-productSchema.pre("save", function (next) {
-  if (this.isModified("name")) {
-    this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-  }
-  next();
-});
 
 // Middleware to update totalStock
 productSchema.pre("save", function (next) {
