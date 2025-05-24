@@ -1,6 +1,8 @@
 "use client";
 import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 type ProductImage = {
   _id: string;
@@ -43,6 +45,7 @@ const ProductsPage = () => {
   const [isRetrying, setIsRetrying] = useState(false);
   const [showConfirm, setShowConfirm] = useState<{ open: boolean, productId?: string, productName?: string }>({ open: false });
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -91,9 +94,9 @@ const ProductsPage = () => {
     }
   };
 
-  
+
   const handleDelete = async (productId: string) => {
-    
+
     const response = await axios.post('/api/admin/deleteProduct', { productId });
     if (response.status === 200) {
       setProducts(products.filter(product => product._id !== productId));
@@ -236,7 +239,7 @@ const ProductsPage = () => {
           }}
           onMouseOver={e => (e.currentTarget.style.background = '#4338ca')}
           onMouseOut={e => (e.currentTarget.style.background = '#6366f1')}
-          onClick={() => alert('Add your first product')}
+          onClick={() => router.push('/admin/dashboard/add-new-product')}
         >
           Add Your First Product
         </button>
@@ -283,15 +286,16 @@ const ProductsPage = () => {
               onMouseOver={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 8px 24px rgba(99,102,241,0.13)'; (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-2px)'; }}
               onMouseOut={e => { (e.currentTarget as HTMLDivElement).style.boxShadow = '0 4px 16px rgba(99,102,241,0.07)'; (e.currentTarget as HTMLDivElement).style.transform = 'none'; }}
             >
-              <span style={{ position: 'absolute', top: '0.7rem', right: '0.7rem', background: '#6366f1', color: '#fff', borderRadius: '0.5rem', padding: '0.13rem 0.6rem', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.01em' }}>ID: {product._id.slice(-6)}</span>
               {product.images && product.images.length > 0 ? (
-                <img
+                <Image
                   src={product.images.find((img) => img.isMain)?.url || product.images[0].url}
                   alt={product.images.find((img) => img.isMain)?.alt || product.name}
-                  style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '0.7rem', marginBottom: '0.8rem', border: '2px solid #6366f1', background: '#f1f5f9' }}
+                  width={120}
+                  height={120}
+                  style={{ objectFit: 'cover', borderRadius: '0.7rem', marginBottom: '0.8rem', border: '2px solid #6366f1', background: '#f1f5f9' }}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/120?text=No+Image';
-                    (e.target as HTMLImageElement).style.border = '2px solid #ef4444';
+                    e.currentTarget.src = 'https://via.placeholder.com/120?text=No+Image';
+                    e.currentTarget.style.border = '2px solid #ef4444';
                   }}
                 />
               ) : (
@@ -362,7 +366,7 @@ const ProductsPage = () => {
                   style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: '0.3rem', padding: '0.3rem 0.8rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem', transition: 'background 0.15s' }}
                   onMouseOver={e => (e.currentTarget.style.background = '#4338ca')}
                   onMouseOut={e => (e.currentTarget.style.background = '#6366f1')}
-                  onClick={() => alert(`Edit product: ${product.name}`)}
+                  onClick={() => router.push(`/admin/dashboard/update-product/${product._id}`)}
                 >
                   Edit
                 </button>
@@ -381,33 +385,33 @@ const ProductsPage = () => {
       )}
 
       {showConfirm.open && (
-  <div style={{
-    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30,41,59,0.25)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
-  }}>
-    <div style={{ background: '#fff', borderRadius: '1rem', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: '2.2rem 2.5rem', minWidth: 340, maxWidth: '90vw', textAlign: 'center', position: 'relative' }}>
-      <div style={{ fontSize: '2.2rem', marginBottom: '0.7rem', color: '#ef4444' }}>⚠️</div>
-      <h3 style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem', color: '#1e293b' }}>Delete Product?</h3>
-      <p style={{ color: '#64748b', marginBottom: '1.2rem', fontSize: '1rem' }}>
-        Are you sure you want to delete <span style={{ color: '#ef4444', fontWeight: 600 }}>&quot;{showConfirm.productName}&quot;</span>?<br />This action cannot be undone.
-      </p>
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.2rem' }}>
-        <button
-          ref={confirmButtonRef}
-          style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '0.4rem', padding: '0.5rem 1.2rem', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(239,68,68,0.08)', transition: 'background 0.15s' }}
-          onClick={confirmDelete}
-        >
-          Yes, Delete
-        </button>
-        <button
-          style={{ background: '#f1f5f9', color: '#334155', border: 'none', borderRadius: '0.4rem', padding: '0.5rem 1.2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(100,116,139,0.07)', transition: 'background 0.15s' }}
-          onClick={closeConfirm}
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        <div style={{
+          position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30,41,59,0.25)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <div style={{ background: '#fff', borderRadius: '1rem', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: '2.2rem 2.5rem', minWidth: 340, maxWidth: '90vw', textAlign: 'center', position: 'relative' }}>
+            <div style={{ fontSize: '2.2rem', marginBottom: '0.7rem', color: '#ef4444' }}>⚠️</div>
+            <h3 style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem', color: '#1e293b' }}>Delete Product?</h3>
+            <p style={{ color: '#64748b', marginBottom: '1.2rem', fontSize: '1rem' }}>
+              Are you sure you want to delete <span style={{ color: '#ef4444', fontWeight: 600 }}>&quot;{showConfirm.productName}&quot;</span>?<br />This action cannot be undone.
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.2rem' }}>
+              <button
+                ref={confirmButtonRef}
+                style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '0.4rem', padding: '0.5rem 1.2rem', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(239,68,68,0.08)', transition: 'background 0.15s' }}
+                onClick={confirmDelete}
+              >
+                Yes, Delete
+              </button>
+              <button
+                style={{ background: '#f1f5f9', color: '#334155', border: 'none', borderRadius: '0.4rem', padding: '0.5rem 1.2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(100,116,139,0.07)', transition: 'background 0.15s' }}
+                onClick={closeConfirm}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         @keyframes spin {

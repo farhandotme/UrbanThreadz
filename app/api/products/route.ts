@@ -1,13 +1,14 @@
-import { NextResponse } from "next/server";
-import ProductModel from "@/models/productModels";
+import { NextResponse } from 'next/server';
+import { connectDB } from '@/DB/dbConfig';
+import ProductModel from '@/models/productModels';
 
 export async function GET() {
   try {
-    const products = await ProductModel.find();
-    return NextResponse.json(products);
+    await connectDB();
+    const products = await ProductModel.find({});
+    return NextResponse.json(products, { status: 200 });
   } catch (error) {
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    } 
+    return NextResponse.json({ message: 'Failed to fetch products', error }, { status: 500 });
   }
 }
+

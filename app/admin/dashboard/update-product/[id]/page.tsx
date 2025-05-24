@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,12 +12,14 @@ import {
   Layout,
   Check,
   Image as ImageIcon,
+  ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { CldUploadWidget } from "next-cloudinary";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required").max(100),
   images: z
@@ -50,15 +52,18 @@ const productSchema = z.object({
       value: z.string().min(1, "Tag cannot be empty"),
     })
   ),
-  isAvailable: z.boolean(), // Make required
+  isAvailable: z.boolean(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-export default function AddNewProduct() {
+export default function EditProduct() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeSection, setActiveSection] = useState("basic");
   const router = useRouter();
+  const params = useParams();
+  const productId = params?.id as string;
 
   const {
     register,
@@ -69,7 +74,6 @@ export default function AddNewProduct() {
     getValues,
     setValue,
   } = useForm<ProductFormValues>({
-    // Explicitly set generic
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
@@ -80,11 +84,10 @@ export default function AddNewProduct() {
       shortDescription: "",
       sizes: [{ name: "M", stock: 0 }],
       category: "",
-      tags: [{ value: "" }],
+      tags: [],
       isAvailable: true,
     },
   });
-
   const {
     fields: imageFields,
     append: appendImage,
@@ -103,20 +106,78 @@ export default function AddNewProduct() {
     remove: removeTag,
   } = useFieldArray({ control, name: "tags" });
 
-  // Submit handler
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!productId) {
+        toast.error("Product ID is required");
+        router.push("/admin/dashboard");
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        const response = await axios.get(`/api/products/${productId}`);
+        const productData = response.data;
+
+        let processedTags = [];
+        if (productData.tags) {
+          if (Array.isArray(productData.tags)) {
+            if (productData.tags.length > 0 && typeof productData.tags[0] === 'object' && productData.tags[0].value !== undefined) {
+              processedTags = productData.tags;
+            } else if (productData.tags.length > 0 && typeof productData.tags[0] === 'string') {
+              processedTags = productData.tags.map((tag: string) => ({ value: tag }));
+            }
+          } else if (typeof productData.tags === 'string') {
+            processedTags = productData.tags.split(',').map((tag: string) => ({ value: tag.trim() })).filter((tag: { value: string }) => tag.value);
+          }
+        }
+
+        const formData = {
+          name: productData.name || "",
+          images: productData.images?.length > 0 ? productData.images : [{ url: "", alt: "", isMain: true }],
+          realPrice: productData.realPrice || 0,
+          discountedPrice: productData.discountedPrice || 0,
+          description: productData.description || "",
+          shortDescription: productData.shortDescription || "",
+          sizes: productData.sizes?.length > 0 ? productData.sizes : [{ name: "M", stock: 0 }],
+          category: productData.category || "",
+          tags: processedTags,
+          isAvailable: productData.isAvailable ?? true,
+        };
+
+        reset(formData);
+        toast.success("Product data loaded successfully");
+      } catch (error) {
+        console.error("Error fetching product:", error);
+        toast.error("Failed to load product data");
+        router.push("/admin/dashboard");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId, reset, router]);
+
   const onSubmit = async (data: ProductFormValues) => {
+    console.log("id:", productId);
     try {
       setIsSubmitting(true);
-      const response = await axios.post("/api/admin/addNewProduct", data);
-      console.log(response.data);
+      const filteredData = {
+        ...data,
+        tags: data.tags.filter(tag => tag.value && tag.value.trim() !== "")
+      };
+      const response = await axios.put(`/api/admin/products/${productId}`, filteredData, { withCredentials: true });
+      console.log("Update response:", response.data);
+
+      
       if (response.status === 200) {
-        toast.success("Product created successfully!");
+        toast.success("Product updated successfully!");
+        router.push("/admin/dashboard");
       }
-      reset();
-      router.push("/admin/dashboard");
     } catch (error) {
-      console.error(error);
-      toast.error("Failed to create product");
+      console.error("Error updating product:", error);
+      toast.error("Failed to update product");
     } finally {
       setIsSubmitting(false);
     }
@@ -126,13 +187,9 @@ export default function AddNewProduct() {
     (index: number, results: { info: { secure_url: string } }) => {
       if (results?.info?.secure_url) {
         setValue(`images.${index}.url`, results.info.secure_url);
-
-        // If this is the first image, set it as the main image automatically
         if (imageFields.length === 1 && index === 0) {
           setValue(`images.${index}.isMain`, true);
         }
-
-        // Force re-render to show the new image
         const updatedImages = [...getValues("images")];
         setValue("images", updatedImages);
       }
@@ -238,8 +295,6 @@ export default function AddNewProduct() {
             </div>
           </div>
         );
-
-      // This is the fixed code for the images case section in your renderSection function
 
       case "images":
         return (
@@ -413,6 +468,7 @@ export default function AddNewProduct() {
             </div>
           </div>
         );
+
       case "descriptions":
         return (
           <div className="space-y-6">
@@ -542,28 +598,60 @@ export default function AddNewProduct() {
                 </button>
               </div>
 
-              <div className="flex flex-wrap gap-2 mb-4">
-                {tagFields.map((field, index) => (
-                  <div
-                    key={field.id}
-                    className="flex items-center bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5 hover:shadow-sm transition-all"
+              {tagFields.length === 0 && (
+                <div className="text-center py-8">
+                  <Tag className="mx-auto h-12 w-12 text-gray-300" />
+                  <p className="mt-2 text-sm text-gray-500">No tags added yet</p>
+                  <button
+                    type="button"
+                    onClick={() => appendTag({ value: "" })}
+                    className="mt-2 text-indigo-600 hover:text-indigo-800 text-sm font-medium"
                   >
-                    <Tag size={14} className="text-gray-500 mr-2" />
-                    <input
-                      {...register(`tags.${index}.value`)}
-                      className="bg-transparent border-none focus:outline-none focus:ring-0 text-sm w-24"
-                      placeholder="Enter tag"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeTag(index)}
-                      className="ml-1 text-gray-400 hover:text-red-500 transition-all"
+                    Add your first tag
+                  </button>
+                </div>
+              )}
+
+              {/* Tags grid */}
+              {tagFields.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {tagFields.map((field, index) => (
+                    <div
+                      key={field.id}
+                      className="flex items-center bg-white border border-gray-200 rounded-lg px-3 py-2 hover:shadow-sm transition-all"
                     >
-                      <X size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      <Tag size={14} className="text-gray-500 mr-2 flex-shrink-0" />
+                      <input
+                        {...register(`tags.${index}.value`)}
+                        className="flex-1 bg-transparent border-none focus:outline-none focus:ring-0 text-sm min-w-0"
+                        placeholder="Enter tag"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeTag(index)}
+                        className="ml-2 text-gray-400 hover:text-red-500 transition-all flex-shrink-0"
+                        title="Remove tag"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Tag validation errors */}
+              {errors.tags && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600">Tag errors:</p>
+                  {tagFields.map((_, index) =>
+                    errors.tags?.[index]?.value && (
+                      <p key={index} className="text-xs text-red-500 mt-1">
+                        Tag {index + 1}: {errors.tags[index]?.value?.message}
+                      </p>
+                    )
+                  )}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -573,6 +661,17 @@ export default function AddNewProduct() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading product data...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
       <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6">
@@ -580,19 +679,26 @@ export default function AddNewProduct() {
           <div className="flex flex-col md:flex-row">
             {/* Sidebar Navigation */}
             <div className="md:w-64 bg-gray-50 p-6">
-              <h1 className="text-2xl font-bold text-gray-800 mb-8">
-                Add Product
-              </h1>
+              <div className="flex items-center mb-8">
+                <button
+                  onClick={() => router.push("/admin/dashboard")}
+                  className="mr-3 p-2 text-gray-600 hover:text-indigo-600 transition-all"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <h1 className="text-2xl font-bold text-gray-800">
+                  Edit Product
+                </h1>
+              </div>
 
               <nav className="space-y-1">
                 <button
                   type="button"
                   onClick={() => setActiveSection("basic")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "basic"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "basic"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
                   Basic Information
@@ -601,11 +707,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("images")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "images"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "images"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <ImageIcon className="mr-3 h-5 w-5" />
                   Product Images
@@ -614,11 +719,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("descriptions")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "descriptions"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "descriptions"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
                   Descriptions
@@ -627,11 +731,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("inventory")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "inventory"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "inventory"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Layers className="mr-3 h-5 w-5" />
                   Sizes & Inventory
@@ -640,11 +743,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("tags")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "tags"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "tags"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Tag className="mr-3 h-5 w-5" />
                   Tags
@@ -680,12 +782,12 @@ export default function AddNewProduct() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Creating...
+                      Updating...
                     </span>
                   ) : (
                     <span className="flex items-center">
                       <Check className="mr-2 h-4 w-4" />
-                      Create Product
+                      Update Product
                     </span>
                   )}
                 </button>
