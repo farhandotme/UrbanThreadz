@@ -11,7 +11,7 @@ import { CldUploadWidget } from "next-cloudinary";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
-// Product schema definition
+
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required").max(100),
   images: z
@@ -313,7 +313,7 @@ export default function AddNewProduct() {
                             cropping: false,
                             sources: ["local"],
                             resourceType: "image",
-                            clientAllowedFormats: ["jpg", "png", "jpeg", "webp"],
+                            // clientAllowedFormats: ["jpg", "png", "jpeg", "webp"],
                           }}
                         >
                           {({ open }) => (

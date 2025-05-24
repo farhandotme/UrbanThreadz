@@ -1,5 +1,6 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState, useRef } from 'react';
 
 type ProductImage = {
   _id: string;
@@ -40,14 +41,16 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<ErrorType | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
+  const [showConfirm, setShowConfirm] = useState<{ open: boolean, productId?: string, productName?: string }>({ open: false });
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   const fetchProducts = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const res = await fetch('/api/products');
-      
+
       if (!res.ok) {
         // Handle different HTTP error status codes
         if (res.status === 401 || res.status === 403) {
@@ -60,23 +63,23 @@ const ProductsPage = () => {
           throw new Error(`Failed to fetch products: HTTP ${res.status}`);
         }
       }
-      
+
       const data = await res.json();
-      
+
       if (!Array.isArray(data)) {
         throw new Error('Invalid data format received from server');
       }
-      
+
       setProducts(data);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError({ 
+        setError({
           message: err.message,
           code: err.name === 'TypeError' ? 'NETWORK_ERROR' : 'API_ERROR',
           retry: true
         });
       } else {
-        setError({ 
+        setError({
           message: 'An unknown error occurred while fetching products',
           code: 'UNKNOWN_ERROR',
           retry: true
@@ -88,15 +91,41 @@ const ProductsPage = () => {
     }
   };
 
+  
+  const handleDelete = async (productId: string) => {
+    
+    const response = await axios.post('/api/admin/deleteProduct', { productId });
+    if (response.status === 200) {
+      setProducts(products.filter(product => product._id !== productId));
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
   }, []);
 
   const handleRetry = () => {
     setIsRetrying(true);
+
     setTimeout(() => {
       fetchProducts();
     }, 500); // Small delay to show the retry animation
+  };
+
+  const openConfirm = (productId: string, productName: string) => {
+    setShowConfirm({ open: true, productId, productName });
+    setTimeout(() => {
+      confirmButtonRef.current?.focus();
+    }, 100);
+  };
+
+  const closeConfirm = () => setShowConfirm({ open: false });
+
+  const confirmDelete = async () => {
+    if (showConfirm.productId) {
+      await handleDelete(showConfirm.productId);
+    }
+    setShowConfirm({ open: false });
   };
 
   const renderErrorState = () => {
@@ -122,7 +151,7 @@ const ProductsPage = () => {
           </div>
         )}
         {error?.retry && (
-          <button 
+          <button
             onClick={handleRetry}
             disabled={isRetrying}
             style={{
@@ -159,8 +188,8 @@ const ProductsPage = () => {
   const renderLoadingState = () => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '4rem 0' }}>
-        <div style={{ 
-          width: '40px', 
+        <div style={{
+          width: '40px',
           height: '40px',
           border: '4px solid #e2e8f0',
           borderTopColor: '#6366f1',
@@ -182,7 +211,7 @@ const ProductsPage = () => {
 
   const renderEmptyState = () => {
     return (
-      <div style={{ 
+      <div style={{
         background: '#f8fafc',
         border: '1px dashed #94a3b8',
         borderRadius: '0.75rem',
@@ -194,7 +223,7 @@ const ProductsPage = () => {
         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>📦</div>
         <h3 style={{ color: '#475569', fontSize: '1.25rem', fontWeight: '600', marginBottom: '0.5rem' }}>No Products Found</h3>
         <p style={{ color: '#64748b', marginBottom: '1.5rem' }}>There are no products in the system yet.</p>
-        <button 
+        <button
           style={{
             background: '#6366f1',
             color: '#fff',
@@ -218,11 +247,11 @@ const ProductsPage = () => {
   return (
     <div style={{ padding: '2rem', background: '#f1f5f9', minHeight: '100vh' }}>
       <h2 style={{ fontSize: '2rem', marginBottom: '2rem', color: '#3730a3', fontWeight: 800, letterSpacing: '0.02em' }}>Admin: Your Products</h2>
-      
+
       {loading && renderLoadingState()}
       {error && renderErrorState()}
       {!loading && !error && products.length === 0 && renderEmptyState()}
-      
+
       {!loading && !error && products.length > 0 && (
         <div style={{
           display: 'flex',
@@ -266,15 +295,15 @@ const ProductsPage = () => {
                   }}
                 />
               ) : (
-                <div style={{ 
-                  width: '120px', 
-                  height: '120px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  borderRadius: '0.7rem', 
-                  marginBottom: '0.8rem', 
-                  border: '2px solid #d1d5db', 
+                <div style={{
+                  width: '120px',
+                  height: '120px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '0.7rem',
+                  marginBottom: '0.8rem',
+                  border: '2px solid #d1d5db',
                   background: '#f1f5f9',
                   color: '#94a3b8',
                   fontSize: '0.8rem',
@@ -291,8 +320,8 @@ const ProductsPage = () => {
                 <span style={{ color: '#ef4444', fontWeight: 500, fontSize: '0.95rem' }}>-{product.discountPercentage || 0}%</span>
               </div>
               <div style={{ marginBottom: '0.3rem', color: '#64748b', fontSize: '0.85rem', textAlign: 'center', minHeight: '36px', whiteSpace: 'pre-line', overflow: 'hidden', textOverflow: 'ellipsis', maxHeight: '2.7em' }}>
-                {product.shortDescription ? 
-                  (product.shortDescription.slice(0, 50) + (product.shortDescription.length > 50 ? '...' : '')) : 
+                {product.shortDescription ?
+                  (product.shortDescription.slice(0, 50) + (product.shortDescription.length > 50 ? '...' : '')) :
                   'No description available'
                 }
               </div>
@@ -306,21 +335,21 @@ const ProductsPage = () => {
                   <span style={{ color: '#9ca3af' }}>N/A</span>
                 )}
               </div>
-              <div style={{ 
-                color: product.isAvailable ? '#16a34a' : '#ef4444', 
-                fontWeight: 600, 
-                fontSize: '0.9rem', 
+              <div style={{
+                color: product.isAvailable ? '#16a34a' : '#ef4444',
+                fontWeight: 600,
+                fontSize: '0.9rem',
                 marginBottom: '0.3rem',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.3rem'
               }}>
-                <span style={{ 
-                  display: 'inline-block', 
-                  width: '8px', 
-                  height: '8px', 
-                  borderRadius: '50%', 
-                  background: product.isAvailable ? '#16a34a' : '#ef4444' 
+                <span style={{
+                  display: 'inline-block',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: product.isAvailable ? '#16a34a' : '#ef4444'
                 }}></span>
                 {product.isAvailable ? 'In Stock' : 'Out of Stock'}
               </div>
@@ -329,19 +358,19 @@ const ProductsPage = () => {
                 Created: {product.createdAt ? new Date(product.createdAt).toLocaleDateString() : 'Unknown date'}
               </div>
               <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto', width: '100%', justifyContent: 'center' }}>
-                <button 
-                  style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: '0.3rem', padding: '0.3rem 0.8rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem', transition: 'background 0.15s' }} 
-                  onMouseOver={e => (e.currentTarget.style.background = '#4338ca')} 
-                  onMouseOut={e => (e.currentTarget.style.background = '#6366f1')} 
+                <button
+                  style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: '0.3rem', padding: '0.3rem 0.8rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem', transition: 'background 0.15s' }}
+                  onMouseOver={e => (e.currentTarget.style.background = '#4338ca')}
+                  onMouseOut={e => (e.currentTarget.style.background = '#6366f1')}
                   onClick={() => alert(`Edit product: ${product.name}`)}
                 >
                   Edit
                 </button>
-                <button 
-                  style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '0.3rem', padding: '0.3rem 0.8rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem', transition: 'background 0.15s' }} 
-                  onMouseOver={e => (e.currentTarget.style.background = '#b91c1c')} 
-                  onMouseOut={e => (e.currentTarget.style.background = '#ef4444')} 
-                  onClick={() => alert(`Delete product: ${product.name}`)}
+                <button
+                  style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '0.3rem', padding: '0.3rem 0.8rem', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem', transition: 'background 0.15s' }}
+                  onMouseOver={e => (e.currentTarget.style.background = '#b91c1c')}
+                  onMouseOut={e => (e.currentTarget.style.background = '#ef4444')}
+                  onClick={() => openConfirm(product._id, product.name)}
                 >
                   Delete
                 </button>
@@ -350,6 +379,35 @@ const ProductsPage = () => {
           ))}
         </div>
       )}
+
+      {showConfirm.open && (
+  <div style={{
+    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(30,41,59,0.25)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+  }}>
+    <div style={{ background: '#fff', borderRadius: '1rem', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: '2.2rem 2.5rem', minWidth: 340, maxWidth: '90vw', textAlign: 'center', position: 'relative' }}>
+      <div style={{ fontSize: '2.2rem', marginBottom: '0.7rem', color: '#ef4444' }}>⚠️</div>
+      <h3 style={{ fontWeight: 700, fontSize: '1.2rem', marginBottom: '0.5rem', color: '#1e293b' }}>Delete Product?</h3>
+      <p style={{ color: '#64748b', marginBottom: '1.2rem', fontSize: '1rem' }}>
+        Are you sure you want to delete <span style={{ color: '#ef4444', fontWeight: 600 }}>&quot;{showConfirm.productName}&quot;</span>?<br />This action cannot be undone.
+      </p>
+      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.2rem' }}>
+        <button
+          ref={confirmButtonRef}
+          style={{ background: '#ef4444', color: '#fff', border: 'none', borderRadius: '0.4rem', padding: '0.5rem 1.2rem', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(239,68,68,0.08)', transition: 'background 0.15s' }}
+          onClick={confirmDelete}
+        >
+          Yes, Delete
+        </button>
+        <button
+          style={{ background: '#f1f5f9', color: '#334155', border: 'none', borderRadius: '0.4rem', padding: '0.5rem 1.2rem', fontWeight: 600, fontSize: '1rem', cursor: 'pointer', boxShadow: '0 2px 8px rgba(100,116,139,0.07)', transition: 'background 0.15s' }}
+          onClick={closeConfirm}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
       <style jsx global>{`
         @keyframes spin {

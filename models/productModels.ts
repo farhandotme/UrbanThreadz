@@ -124,7 +124,6 @@ const productSchema = new Schema<Product>(
   }
 );
 
-// Middleware to update totalStock
 productSchema.pre("save", function (next) {
   if (this.isModified("sizes")) {
     this.totalStock = this.sizes.reduce((total, size) => total + size.stock, 0);
@@ -132,7 +131,6 @@ productSchema.pre("save", function (next) {
   next();
 });
 
-// Virtual for calculating discount percentage
 productSchema.virtual("discountPercentage").get(function (this: Product) {
   if (!this.realPrice || !this.discountedPrice) return 0;
   return Math.round(
