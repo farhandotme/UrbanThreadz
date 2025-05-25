@@ -64,6 +64,9 @@ const productSchema = new Schema<Product>(
       min: [0, "Price cannot be negative"],
       validate: {
         validator: function (this: Product, value: number) {
+          // Only validate if both are finite numbers
+          if (!Number.isFinite(value) || !Number.isFinite(this.realPrice)) return true;
+          // Allow discountedPrice to be equal to realPrice or less
           return value <= this.realPrice;
         },
         message: "Discounted price cannot be greater than real price",

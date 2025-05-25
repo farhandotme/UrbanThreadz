@@ -15,45 +15,50 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { CldUploadWidget } from "next-cloudinary";
 import axios from "axios";
 import { useRouter, useParams } from "next/navigation";
 
-const productSchema = z.object({
-  name: z.string().min(1, "Product name is required").max(100),
-  images: z
-    .array(
+const productSchema = z
+  .object({
+    name: z.string().min(1, "Product name is required").max(100),
+    images: z
+      .array(
+        z.object({
+          url: z.string().min(1, "Image URL is required"),
+          alt: z.string().optional(),
+          isMain: z.boolean(),
+        })
+      )
+      .min(1, { message: "At least one image is required" })
+      .refine((images) => images.some((img) => img.isMain), {
+        message: "At least one image must be set as main",
+      }),
+    realPrice: z.number().min(0, "Price cannot be negative"),
+    discountedPrice: z.number().min(0, "Price cannot be negative"),
+    description: z.string().min(1, "Description is required").max(2000),
+    shortDescription: z.string().min(1, "Short description is required").max(200),
+    sizes: z
+      .array(
+        z.object({
+          name: z.enum(["S", "M", "L", "XL", "XXL"]),
+          stock: z.number().min(0, "Stock cannot be negative"),
+        })
+      )
+      .min(1, "At least one size is required"),
+    category: z.string().min(1, "Category is required"),
+    tags: z.array(
       z.object({
-        url: z.string().min(1, "Image URL is required"),
-        alt: z.string().optional(),
-        isMain: z.boolean(),
+        value: z.string().min(1, "Tag cannot be empty"),
       })
-    )
-    .min(1, { message: "At least one image is required" })
-    .refine((images) => images.some((img) => img.isMain), {
-      message: "At least one image must be set as main",
-    }),
-  realPrice: z.number().min(0, "Price cannot be negative"),
-  discountedPrice: z.number().min(0, "Price cannot be negative"),
-  description: z.string().min(1, "Description is required").max(2000),
-  shortDescription: z.string().min(1, "Short description is required").max(200),
-  sizes: z
-    .array(
-      z.object({
-        name: z.enum(["S", "M", "L", "XL", "XXL"]),
-        stock: z.number().min(0, "Stock cannot be negative"),
-      })
-    )
-    .min(1, "At least one size is required"),
-  category: z.string().min(1, "Category is required"),
-  tags: z.array(
-    z.object({
-      value: z.string().min(1, "Tag cannot be empty"),
-    })
-  ),
-  isAvailable: z.boolean(),
-});
+    ),
+    isAvailable: z.boolean(),
+  })
+  .refine((data) => data.discountedPrice <= data.realPrice, {
+    message: "Discounted price cannot be greater than real price",
+    path: ["discountedPrice"],
+  });
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
@@ -73,8 +78,11 @@ export default function EditProduct() {
     formState: { errors },
     getValues,
     setValue,
+    watch,
+    trigger,
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
+    mode: "onChange", // Enable real-time validation
     defaultValues: {
       name: "",
       images: [{ url: "", alt: "", isMain: true }],
@@ -88,6 +96,18 @@ export default function EditProduct() {
       isAvailable: true,
     },
   });
+
+  // Watch price fields for real-time validation
+  const realPrice = watch("realPrice");
+  const discountedPrice = watch("discountedPrice");
+
+  // Trigger validation when prices change
+  useEffect(() => {
+    if (realPrice !== undefined && discountedPrice !== undefined) {
+      trigger(["realPrice", "discountedPrice"]);
+    }
+  }, [realPrice, discountedPrice, trigger]);
+
   const {
     fields: imageFields,
     append: appendImage,
@@ -161,23 +181,62 @@ export default function EditProduct() {
 
   const onSubmit = async (data: ProductFormValues) => {
     console.log("id:", productId);
+    // Ensure prices are numbers and not undefined/null
+    const realPrice = typeof data.realPrice === "number" && !isNaN(data.realPrice) ? data.realPrice : 0;
+    const discountedPrice = typeof data.discountedPrice === "number" && !isNaN(data.discountedPrice) ? data.discountedPrice : 0;
+    // Additional client-side validation before submission
+    if (discountedPrice > realPrice) {
+      toast.error("Discounted price cannot be greater than real price");
+      return;
+    }
+    // Validate that at least one image has a URL
+    const hasValidImage = data.images.some(img => img.url && img.url.trim() !== '');
+    if (!hasValidImage) {
+      toast.error("Please add at least one product image");
+      setActiveSection("images");
+      return;
+    }
+    // Validate that at least one image is marked as main
+    const hasMainImage = data.images.some(img => img.isMain && img.url && img.url.trim() !== '');
+    if (!hasMainImage) {
+      toast.error("Please set at least one image as the main image");
+      setActiveSection("images");
+      return;
+    }
     try {
       setIsSubmitting(true);
       const filteredData = {
         ...data,
-        tags: data.tags.filter(tag => tag.value && tag.value.trim() !== "")
+        realPrice,
+        discountedPrice,
+        tags: data.tags.filter(tag => tag.value && tag.value.trim() !== ""),
+        images: data.images.filter(img => img.url && img.url.trim() !== "")
       };
-      const response = await axios.put(`/api/admin/products/${productId}`, filteredData, { withCredentials: true });
+      console.log("Submitting data:", filteredData);
+      const response = await axios.put(`/api/admin/updateProducts/${productId}`, filteredData, { withCredentials: true });
       console.log("Update response:", response.data);
-
-      
       if (response.status === 200) {
         toast.success("Product updated successfully!");
-        router.push("/admin/dashboard");
+        setTimeout(() => {
+          router.push("/admin/dashboard/products");
+        }, 1000);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error updating product:", error);
-      toast.error("Failed to update product");
+      if (axios.isAxiosError(error)) {
+        if (error.response?.data?.details) {
+          toast.error(error.response.data.details);
+        } else if (error.response?.data?.message) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.error("Failed to update product. Please check all fields and try again.");
+        }
+        if (error.response?.data?.details?.includes("price")) {
+          setActiveSection("basic");
+        } else if (error.response?.data?.details?.includes("image")) {
+          setActiveSection("images");
+        }
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -224,7 +283,7 @@ export default function EditProduct() {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    $
+                    ₹
                   </span>
                   <input
                     type="number"
@@ -247,7 +306,7 @@ export default function EditProduct() {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    $
+                    ₹
                   </span>
                   <input
                     type="number"
@@ -801,6 +860,7 @@ export default function EditProduct() {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }

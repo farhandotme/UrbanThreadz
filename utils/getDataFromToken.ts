@@ -8,7 +8,7 @@ interface TokenPayload {
   image?: string;
 }
 
-export const getDataFromToken = async (req: unknown) => {
+export const getDataFromToken = async () => {
   try {
     const token = (await cookies()).get("token")?.value;
     if (!token) return null;

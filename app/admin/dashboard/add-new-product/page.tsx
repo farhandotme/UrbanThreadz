@@ -14,7 +14,7 @@ import {
   Image as ImageIcon,
 } from "lucide-react";
 import Image from "next/image";
-import { toast } from "sonner";
+import { toast, Toaster } from "sonner";
 import { CldUploadWidget } from "next-cloudinary";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -113,7 +113,9 @@ export default function AddNewProduct() {
         toast.success("Product created successfully!");
       }
       reset();
-      router.push("/admin/dashboard");
+      setTimeout(() => {
+        router.push("/admin/dashboard");
+      }, 500);
     } catch (error) {
       console.error(error);
       toast.error("Failed to create product");
@@ -167,7 +169,7 @@ export default function AddNewProduct() {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    $
+                    ₹
                   </span>
                   <input
                     type="number"
@@ -190,7 +192,7 @@ export default function AddNewProduct() {
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                    $
+                    ₹
                   </span>
                   <input
                     type="number"
@@ -239,7 +241,6 @@ export default function AddNewProduct() {
           </div>
         );
 
-      // This is the fixed code for the images case section in your renderSection function
 
       case "images":
         return (
@@ -588,11 +589,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("basic")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "basic"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "basic"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
                   Basic Information
@@ -601,11 +601,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("images")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "images"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "images"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <ImageIcon className="mr-3 h-5 w-5" />
                   Product Images
@@ -614,11 +613,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("descriptions")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "descriptions"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "descriptions"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
                   Descriptions
@@ -627,11 +625,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("inventory")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "inventory"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "inventory"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Layers className="mr-3 h-5 w-5" />
                   Sizes & Inventory
@@ -640,11 +637,10 @@ export default function AddNewProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("tags")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                    activeSection === "tags"
-                      ? "bg-indigo-50 text-indigo-700"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "tags"
+                    ? "bg-indigo-50 text-indigo-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                    }`}
                 >
                   <Tag className="mr-3 h-5 w-5" />
                   Tags
@@ -699,6 +695,7 @@ export default function AddNewProduct() {
           </div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }

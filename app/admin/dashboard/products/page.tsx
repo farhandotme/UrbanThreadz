@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { toast, Toaster } from 'sonner';
 
 type ProductImage = {
   _id: string;
@@ -122,13 +123,17 @@ const ProductsPage = () => {
     }, 100);
   };
 
-  const closeConfirm = () => setShowConfirm({ open: false });
+  const closeConfirm = () => {
+    setShowConfirm({ open: false })
+
+  };
 
   const confirmDelete = async () => {
     if (showConfirm.productId) {
       await handleDelete(showConfirm.productId);
     }
     setShowConfirm({ open: false });
+    toast.success('Product deleted successfully');
   };
 
   const renderErrorState = () => {
@@ -381,6 +386,7 @@ const ProductsPage = () => {
               </div>
             </div>
           ))}
+          <Toaster />
         </div>
       )}
 
@@ -410,6 +416,7 @@ const ProductsPage = () => {
               </button>
             </div>
           </div>
+          
         </div>
       )}
 

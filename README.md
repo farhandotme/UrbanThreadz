@@ -52,3 +52,17 @@ A full-stack e-commerce application built with Next.js, React, Tailwind CSS, and
     # or
     pnpm dev
     ```
+
+## Example `.env.local` file
+
+```env
+MONGODB_URI=your_mongodb_connection_string
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+NEXTAUTH_SECRET=your_nextauth_secret
+NEXTAUTH_URL=http://localhost:3000
+JWT_SECRET=your_jwt_secret
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=your_admin_password
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+```

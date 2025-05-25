@@ -18,7 +18,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       { message: "Product created successfully", product: newProduct },
-      { status: 201 }
+      { status: 200 }
     );
 
   } catch (error) {
