@@ -1,5 +1,4 @@
 "use client"
-
 import Image from 'next/image'
 import { Heart, ShoppingCart } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -65,17 +64,18 @@ export default function ProductCard({ product }: { product: Product }) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.04, boxShadow: '0 8px 32px rgba(0,0,0,0.10)' }}
-      className="group relative bg-white border border-gray-200 rounded-xl shadow-md transition-all duration-300 p-3 overflow-hidden min-h-[340px] max-w-xs mx-auto flex flex-col hover:z-20"
+      className="group relative bg-white border border-gray-200 rounded-xl shadow-md transition-all duration-300 p-3 overflow-hidden h-[480px] w-[280px] mx-auto flex flex-col hover:z-20"
       onMouseEnter={() => setShowDetails(true)}
       onMouseLeave={() => setShowDetails(false)}
     >
       {/* Image */}
-      <div className="relative w-full aspect-square mb-3 overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
+      <div className="relative w-full h-[320px] mb-3 overflow-hidden rounded-lg border border-gray-100 bg-gray-50 flex items-center justify-center">
         <Image
           src={mainImage.url}
           alt={mainImage.alt}
           fill
           className="object-cover group-hover:scale-110 transition-transform duration-500"
+          style={{ objectFit: 'cover', objectPosition: 'center' }}
         />
         {product.discountPercentage && product.discountPercentage > 0 && (
           <div className="absolute top-2 left-2 bg-black text-white text-xs font-bold px-2 py-1 rounded-full shadow">
@@ -85,8 +85,8 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-between">
-        <div>
+      <div className="flex-1 flex flex-col justify-between min-h-0">
+        <div className="overflow-hidden">
           <h2 className="text-base font-semibold text-gray-900 mb-1 line-clamp-1 tracking-tight">
             {product.name}
           </h2>
@@ -183,7 +183,7 @@ export function ProductsGrid() {
   if (!products.length) return <div className="text-center text-gray-400 py-10">No products found.</div>;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center">
       {products.map(product => (
         <ProductCard key={product._id} product={product} />
       ))}
