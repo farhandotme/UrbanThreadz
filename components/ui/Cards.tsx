@@ -104,6 +104,9 @@ export default function ProductCard({ product }: { product: Product }) {
             </span>
           )}
         </div>
+        {!product.isAvailable || product.totalStock === 0 ? (
+          <div className="mt-2 text-xs font-semibold text-red-600">Out of Stock</div>
+        ) : null}
       </div>
 
       {/* Animated Actions on Hover */}
@@ -137,7 +140,10 @@ export default function ProductCard({ product }: { product: Product }) {
             >
               <Heart className={`w-6 h-6 ${isWishlisted ? 'fill-black text-black animate-pulse' : 'text-gray-500'} transition-all`} />
             </button>
-            <button className="flex-1 bg-black text-white px-3 py-2 rounded-lg hover:bg-gray-900 transition-colors text-xs font-semibold shadow">
+            <button
+              className="flex-1 bg-black text-white px-3 py-2 rounded-lg hover:bg-gray-900 transition-colors text-xs font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
+              disabled={!product.isAvailable || product.totalStock === 0}
+            >
               Buy Now
             </button>
             <button className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 transition-colors" aria-label="Add to cart">
