@@ -82,6 +82,21 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "google") {
+        const existing = await userModels.findOne({ email: user.email });
+        if (!existing) {
+          await userModels.create({
+            fullname: user.name || profile?.name || "Google User",
+            email: user.email,
+            password: "google-oauth-no-password",
+            wishlist: [],
+            cart: [],
+          });
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;

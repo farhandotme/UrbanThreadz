@@ -168,7 +168,7 @@ export default function SalePage() {
 
   return (
     <div className="min-h-screen bg-white mt-20">
-      <Navbar/>
+      <Navbar />
 
       {/* Header */}
       <div className="bg-white border-b border-gray-100">
@@ -206,11 +206,10 @@ export default function SalePage() {
                     <button
                       key={tag}
                       onClick={() => toggleTag(tag)}
-                      className={`w-full text-left px-3 py-2 rounded-lg border transition-all duration-200 ${
-                        selectedTags.includes(tag)
-                          ? "bg-gray-900 text-white border-gray-900 shadow-sm"
-                          : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                      }`}
+                      className={`w-full text-left px-3 py-2 rounded-lg border transition-all duration-200 ${selectedTags.includes(tag)
+                        ? "bg-gray-900 text-white border-gray-900 shadow-sm"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        }`}
                     >
                       <span className="font-medium">{tag}</span>
                     </button>
@@ -262,11 +261,10 @@ export default function SalePage() {
                           <button
                             key={tag}
                             onClick={() => toggleTag(tag)}
-                            className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all duration-200 ${
-                              selectedTags.includes(tag)
-                                ? "bg-gray-900 text-white border-gray-900"
-                                : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
-                            }`}
+                            className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all duration-200 ${selectedTags.includes(tag)
+                              ? "bg-gray-900 text-white border-gray-900"
+                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
+                              }`}
                           >
                             {tag}
                           </button>

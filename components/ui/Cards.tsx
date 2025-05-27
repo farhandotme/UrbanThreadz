@@ -3,8 +3,10 @@ import Image from "next/image"
 import { Heart, ShoppingCart } from "lucide-react"
 import { motion } from "framer-motion"
 import { useState, useEffect } from "react"
-import { useSession, signIn } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import axios from "axios"
+import { useAuthAction } from "@/components/AuthActionContext"
+import { toast } from "sonner"
 
 interface ProductImage {
   url: string
@@ -36,26 +38,62 @@ interface Product {
 }
 export default function ProductCard({ product }: { product: Product }) {
   const { data: session } = useSession()
+  const { runOrQueueAction } = useAuthAction()
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
+
+  useEffect(() => {
+    async function fetchWishlistStatus() {
+      if (!session) {
+        setIsWishlisted(false)
+        return
+      }
+      try {
+        const res = await axios.get("/api/users/wishlist", { params: { productId: product._id } })
+        setIsWishlisted(res.data.isWishlisted)
+      } catch {
+        setIsWishlisted(false)
+      }
+    }
+    fetchWishlistStatus()
+  }, [session, product._id])
 
   const images = Array.isArray(product.images) ? product.images : []
   const mainImage = images.find((img) => img.isMain) || images[0] || { url: "/logo.png", alt: product.name }
 
   const handleWishlist = async () => {
     if (!session) {
-      signIn()
+      runOrQueueAction(() => {})
+      toast.info("You need to login to use wishlist.")
       return
     }
     setLoading(true)
     try {
-      // Call your wishlist API (assume /api/users/wishlist)
       const res = await axios.post("/api/users/wishlist", { productId: product._id })
-      if (res.status === 200) setIsWishlisted((prev) => !prev)
+      if (res.status === 200) {
+        // Re-fetch wishlist status to ensure correct state (handles Google login edge case)
+        const check = await axios.get("/api/users/wishlist", { params: { productId: product._id } })
+        setIsWishlisted(check.data.isWishlisted)
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleBuyNow = () => {
+    runOrQueueAction(async () => {
+      // Call your add-to-cart API and redirect to cart/checkout
+      await axios.post("/api/users/cart", { productId: product._id })
+      window.location.href = "/cart"
+    })
+  }
+
+  const handleAddToCart = () => {
+    runOrQueueAction(async () => {
+      await axios.post("/api/users/cart", { productId: product._id })
+      // Optionally show a toast or feedback
+    })
   }
   return (
     <motion.div
@@ -149,12 +187,14 @@ export default function ProductCard({ product }: { product: Product }) {
             <button
               className="flex-1 bg-black text-white px-3 py-2 rounded-lg hover:bg-gray-900 transition-colors text-xs font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={!product.isAvailable || product.totalStock === 0}
+              onClick={handleBuyNow}
             >
               Buy Now
             </button>
             <button
               className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 transition-colors"
               aria-label="Add to cart"
+              onClick={handleAddToCart}
             >
               <ShoppingCart className="w-5 h-5 text-black" />
             </button>

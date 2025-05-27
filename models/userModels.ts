@@ -4,6 +4,8 @@ interface User extends mongoose.Document {
   fullname: string;
   email: string;
   password: string;
+  wishlist: mongoose.Types.ObjectId[];
+  cart: mongoose.Types.ObjectId[];
 }
 
 const userSchema = new mongoose.Schema<User>(
@@ -21,6 +23,18 @@ const userSchema = new mongoose.Schema<User>(
       type: String,
       required: true,
     },
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
+    cart: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
   },
   { timestamps: true }
 );
