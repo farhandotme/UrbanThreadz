@@ -1,10 +1,13 @@
 "use client";
 import Slider from "@/components/Slider";
 import { ProductsGrid } from "@/components/ui/Cards";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/ui/Footer";
+import Navbar from "@/components/Navbar";
+import Link from "next/link";
 
 export default function Home() {
+  const collections = "collections";
+  const newArrivals = "new arrivals";
   return (
     <>
       <Navbar />
@@ -12,14 +15,28 @@ export default function Home() {
         <section className="mb-12">
           <Slider />
         </section>
-
         <section className="space-y-8">
-          <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Collections</h1>
-            <button className="text-blue-600 hover:text-blue-800">View All</button>
+          <div className="flex items-center justify-between mb-8 gap-4">
+            <div className="flex items-center gap-3">
+              <span className="inline-block w-1.5 h-8 bg-black rounded-full mr-2" />
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                {newArrivals.charAt(0).toUpperCase() + newArrivals.slice(1)}
+              </h1>
+            </div>
+            <Link href="/sale" className="px-5 py-2 border border-gray-300 text-gray-800 font-medium rounded-lg hover:bg-gray-900 hover:text-white transition-colors shadow-sm">
+              View All
+            </Link>
           </div>
-
-          <ProductsGrid />
+          <ProductsGrid heading={newArrivals} />
+          <div className="flex items-center justify-between mt-16 mb-8 gap-4">
+            <div className="flex items-center gap-3">
+              <span className="inline-block w-1.5 h-8 bg-black rounded-full mr-2" />
+              <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+                {collections.charAt(0).toUpperCase() + collections.slice(1)}
+              </h1>
+            </div>
+          </div>
+          <ProductsGrid heading={collections} />
         </section>
       </main>
       <Footer />

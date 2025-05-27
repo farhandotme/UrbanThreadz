@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
-
 export const metadata: Metadata = {
   title: "UrbanThreadz",
   description: "Your one-stop shop for urban fashion and streetwear.",
@@ -21,6 +20,7 @@ export default function RootLayout({
     <SessionWrapper>
       <html lang="en">
         <body className="relative">
+
           {children}
         </body>
       </html>

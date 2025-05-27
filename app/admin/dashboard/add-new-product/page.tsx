@@ -214,12 +214,14 @@ export default function AddNewProduct() {
               <label className="text-sm font-medium text-gray-700">
                 Category
               </label>
-              <input
-                type="text"
+              <select
                 {...register("category")}
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
-                placeholder="Enter product category"
-              />
+              >
+                <option value="">Select category</option>
+                <option value="collections">Collections</option>
+                <option value="new arrivals">New Arrivals</option>
+              </select>
               {errors.category && (
                 <p className="text-sm text-red-500">
                   {errors.category.message}
