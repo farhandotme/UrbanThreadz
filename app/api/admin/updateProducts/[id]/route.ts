@@ -3,6 +3,7 @@ import { connectDB } from "@/DB/dbConfig";
 import ProductModel from "@/models/productModels";
 import mongoose from "mongoose";
 
+// @ts-expect-error Next.js 15 requires params to be untyped
 export async function PUT(
   req: NextRequest,
   { params }: any
