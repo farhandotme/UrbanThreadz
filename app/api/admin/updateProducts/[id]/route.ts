@@ -3,10 +3,13 @@ import { connectDB } from "@/DB/dbConfig";
 import ProductModel from "@/models/productModels";
 import mongoose from "mongoose";
 
-export async function PUT(req: NextRequest, context: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+): Promise<NextResponse> {
   try {
     await connectDB();
-    const id = context.params.id;
+    const id = params.id;
 
     // Check for valid MongoDB ObjectId
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
@@ -74,9 +77,14 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
     }
 
     return NextResponse.json(updatedProduct, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Error updating product:", error);
-    if (error && typeof error === "object" && error !== null && "errors" in error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      error !== null &&
+      "errors" in error
+    ) {
       const mongooseErrors = (error as { errors: Record<string, { message: string }> }).errors;
       const details = Object.values(mongooseErrors)
         .map((err) => err && typeof err === "object" && "message" in err ? err.message : String(err))
@@ -91,4 +99,4 @@ export async function PUT(req: NextRequest, context: { params: { id: string } })
       { status: 500 }
     );
   }
-} 
+}
