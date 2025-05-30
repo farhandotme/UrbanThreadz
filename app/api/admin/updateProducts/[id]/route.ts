@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: any
 ): Promise<NextResponse> {
   try {
     await connectDB();
