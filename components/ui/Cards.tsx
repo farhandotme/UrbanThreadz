@@ -233,7 +233,25 @@ export function ProductsGrid({ heading, products }: { heading?: string; products
     fetchProducts()
   }, [products])
 
-  if (loading) return <div className="text-center text-white py-10">Loading products...</div>
+  if (loading) {
+    return (
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center px-2 sm:px-0">
+        {[...Array(10)].map((_, i) => (
+          <div
+            key={i}
+            className="relative bg-white border border-gray-200 rounded-xl shadow-md p-2 sm:p-3 h-[380px] sm:h-[400px] w-full max-w-[280px] sm:max-w-[380px] animate-pulse"
+          >
+            <div className="w-full h-[240px] sm:h-[260px] mb-2 sm:mb-3 rounded-lg bg-gray-200" />
+            <div className="space-y-3">
+              <div className="h-4 bg-gray-200 rounded w-3/4" />
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+              <div className="h-4 bg-gray-200 rounded w-1/4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
   if (error) return <div className="text-center text-red-500 py-10">{error}</div>
   if (!internalProducts.length) return <div className="text-center text-gray-400 py-10">No products found.</div>
 
