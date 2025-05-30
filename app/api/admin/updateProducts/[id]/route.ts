@@ -63,7 +63,6 @@ export async function PUT(
     }
 
     // Log for debugging
-    console.log("Updating product:", id, body)
 
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       id,

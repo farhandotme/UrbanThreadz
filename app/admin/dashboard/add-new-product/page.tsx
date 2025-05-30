@@ -108,7 +108,6 @@ export default function AddNewProduct() {
     try {
       setIsSubmitting(true);
       const response = await axios.post("/api/admin/addNewProduct", data);
-      console.log(response.data);
       if (response.status === 200) {
         toast.success("Product created successfully!");
       }

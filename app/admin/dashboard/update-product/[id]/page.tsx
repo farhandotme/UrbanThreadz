@@ -180,7 +180,6 @@ export default function EditProduct() {
   }, [productId, reset, router]);
 
   const onSubmit = async (data: ProductFormValues) => {
-    console.log("id:", productId);
     // Ensure prices are numbers and not undefined/null
     const realPrice = typeof data.realPrice === "number" && !isNaN(data.realPrice) ? data.realPrice : 0;
     const discountedPrice = typeof data.discountedPrice === "number" && !isNaN(data.discountedPrice) ? data.discountedPrice : 0;
@@ -212,9 +211,7 @@ export default function EditProduct() {
         tags: data.tags.filter(tag => tag.value && tag.value.trim() !== ""),
         images: data.images.filter(img => img.url && img.url.trim() !== "")
       };
-      console.log("Submitting data:", filteredData);
       const response = await axios.put(`/api/admin/updateProducts/${productId}`, filteredData, { withCredentials: true });
-      console.log("Update response:", response.data);
       if (response.status === 200) {
         toast.success("Product updated successfully!");
         setTimeout(() => {
@@ -222,7 +219,6 @@ export default function EditProduct() {
         }, 1000);
       }
     } catch (error: unknown) {
-      console.error("Error updating product:", error);
       if (axios.isAxiosError(error)) {
         if (error.response?.data?.details) {
           toast.error(error.response.data.details);

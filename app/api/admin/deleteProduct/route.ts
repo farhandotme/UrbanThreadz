@@ -6,7 +6,6 @@ export async function POST(req: NextRequest) {
   try {
     connectDB();
     const { productId } = await req.json();
-    console.log("Received productId:", productId);
 
     if (!productId) {
       return new Response("Product ID is required", { status: 400 });
