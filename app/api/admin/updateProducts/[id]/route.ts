@@ -1,21 +1,19 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { connectDB } from "@/DB/dbConfig"
 import ProductModel from "@/models/productModels"
 import mongoose from "mongoose"
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> {
+export async function PUT(request: Request, context: { params: { id: string } }): Promise<Response> {
   try {
     await connectDB()
-
-    // Await the params in Next.js 15
-    const { id } = await params
+    const { id } = context.params
 
     // Check for valid MongoDB ObjectId
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ message: "Invalid or missing Product ID" }, { status: 400 })
     }
 
-    const body = await req.json()
+    const body = await request.json()
 
     // Transform tags to array of strings if needed
     if (body.tags && Array.isArray(body.tags)) {
@@ -65,7 +63,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json(updatedProduct, { status: 200 })
   } catch (error: unknown) {
     console.error("Error updating product:", error)
-
     if (error && typeof error === "object" && error !== null && "errors" in error) {
       const mongooseErrors = (error as { errors: Record<string, { message: string }> }).errors
       const details = Object.values(mongooseErrors)
@@ -73,7 +70,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         .join("; ")
       return NextResponse.json({ message: "Failed to update product", details }, { status: 400 })
     }
-
     return NextResponse.json(
       { message: "Failed to update product", details: (error as Error).message },
       { status: 500 },
