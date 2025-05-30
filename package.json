@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-dialog": "^1.1.13",
     "@types/next-auth": "^3.13.0",

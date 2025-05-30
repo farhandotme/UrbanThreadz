@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Search, ShoppingCart, User, Heart, Menu, X, ChevronDown } from 'lucide-react';
-import Link from 'next/link';
 import AuthModal from '@/components/ui/AuthModal';
-import { useSession, signOut } from 'next-auth/react';
-import Image from 'next/image';
+import { signOut, useSession } from 'next-auth/react';
 import axios from 'axios';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { ChevronDown, Heart, Menu, Search, ShoppingCart, User, X } from 'lucide-react';
+
+import Cart from './cart';
 
 declare module 'next-auth' {
   interface Session {
@@ -20,7 +22,6 @@ declare module 'next-auth' {
 }
 
 export default function TshirtEcomNavbar() {
-
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -29,6 +30,7 @@ export default function TshirtEcomNavbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [wishlistCount, setWishlistCount] = useState<number>(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const categories = [
     { id: 1, name: 'New Arrivals', subcategories: ['This Week', 'This Month', 'Trending'], path: '/new-arrivals' },
@@ -326,10 +328,14 @@ export default function TshirtEcomNavbar() {
             </div>
 
             {/* Cart */}
-            <Link href="/cart" className="text-gray-700 hover:text-black transition-colors relative">
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="text-gray-700 hover:text-black transition-colors relative"
+            >
               <ShoppingCart size={20} />
               <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">3</span>
-            </Link>
+            </button>
+            <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           </div>
         </div>
       </div>
@@ -473,12 +479,15 @@ export default function TshirtEcomNavbar() {
             </div>
 
             {/* Cart */}
-            <Link href="/cart" className="text-gray-700 hover:text-black transition-colors relative">
+            <button 
+              onClick={() => setIsCartOpen(true)}
+              className="text-gray-700 hover:text-black transition-colors relative"
+            >
               <ShoppingCart size={20} />
               <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                 3
               </span>
-            </Link>
+            </button>
           </div>
 
         </div>
