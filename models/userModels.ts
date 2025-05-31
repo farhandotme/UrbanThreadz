@@ -5,7 +5,10 @@ interface User extends mongoose.Document {
   email: string;
   password: string;
   wishlist: mongoose.Types.ObjectId[];
-  cart: mongoose.Types.ObjectId[];
+  cart: {
+    productId: mongoose.Types.ObjectId;
+    quantity: number;
+  }[];
 }
 
 const userSchema = new mongoose.Schema<User>(
@@ -31,8 +34,16 @@ const userSchema = new mongoose.Schema<User>(
     ],
     cart: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+        },
+        quantity: {
+          type: Number,
+          default: 1,
+          min: 1,
+          max: 10,
+        },
       },
     ],
   },

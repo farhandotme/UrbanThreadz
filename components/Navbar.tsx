@@ -21,6 +21,10 @@ declare module 'next-auth' {
   }
 }
 
+interface CartItem {
+  quantity: number;
+}
+
 export default function TshirtEcomNavbar() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,6 +35,7 @@ export default function TshirtEcomNavbar() {
   const [isMounted, setIsMounted] = useState(false);
   const [wishlistCount, setWishlistCount] = useState<number>(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   const categories = [
     { id: 1, name: 'New Arrivals', subcategories: ['This Week', 'This Month', 'Trending'], path: '/new-arrivals' },
@@ -97,6 +102,22 @@ export default function TshirtEcomNavbar() {
     }
     fetchWishlistCount();
   }, [status]);
+
+  useEffect(() => {
+    const fetchCartCount = async () => {
+      try {
+        const response = await axios.get('/api/users/cart');
+        const items = response.data as CartItem[];
+        setCartItemCount(items.reduce((count: number, item: CartItem) => count + item.quantity, 0));
+      } catch (error) {
+        console.error('Failed to fetch cart count:', error);
+      }
+    };
+
+    if (session) {
+      fetchCartCount();
+    }
+  }, [session]);
 
   const toggleDropdown = (e: React.MouseEvent<HTMLButtonElement>, categoryId: number) => {
     e.stopPropagation();
@@ -333,7 +354,11 @@ export default function TshirtEcomNavbar() {
               className="text-gray-700 hover:text-black transition-colors relative"
             >
               <ShoppingCart size={20} />
-              <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">3</span>
+              {cartItemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                  {cartItemCount}
+                </span>
+              )}
             </button>
             <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           </div>
