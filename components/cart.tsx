@@ -25,10 +25,10 @@ interface CartItem {
 
 const Cart = ({ isOpen, onClose }: CartProps) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(false); // Start with loading false
+  const [loading, setLoading] = useState(false);
   const { data: session } = useSession();
 
-  const fetchCartItems = useCallback(async () => {
+  const fetchCartItems = useCallback(async (retry = true) => {
     if (!session?.user) {
       setCartItems([]);
       return;
@@ -42,15 +42,34 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
           'Content-Type': 'application/json',
         }
       });
-      setCartItems(response.data || []);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        toast.error('Please sign in to view your cart');
+      
+      // Validate response data
+      if (Array.isArray(response.data)) {
+        const validItems = response.data.filter(item => 
+          item && typeof item === 'object' && 
+          item._id && item.name && Array.isArray(item.images)
+        );
+        setCartItems(validItems);
       } else {
-        toast.error(`Failed to fetch cart items: ${errorMessage}`);
+        setCartItems([]);
+        console.error('Invalid cart data received:', response.data);
       }
+    } catch (error) {
       setCartItems([]);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
+          toast.error('Please sign in to view your cart');
+        } else if (error.response?.status === 500 && retry) {
+          // Retry once on 500 error
+          console.log('Retrying cart fetch...');
+          setTimeout(() => fetchCartItems(false), 1000);
+          return;
+        } else {
+          toast.error('Failed to load cart items. Please try again.');
+        }
+      } else {
+        toast.error('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
