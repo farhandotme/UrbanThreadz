@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { ChevronDown, Heart, Menu, Search, ShoppingCart, User, X } from 'lucide-react';
 
 import Cart from './cart';
+import { toast, Toaster } from 'sonner';
 
 declare module 'next-auth' {
   interface Session {
@@ -128,6 +129,7 @@ export default function TshirtEcomNavbar() {
     e.preventDefault();
     setShowProfileMenu(false);
     await signOut({ redirect: false });
+    toast.success('Logged out successfully');
   };
   if (!isMounted) {
     return (
@@ -517,6 +519,7 @@ export default function TshirtEcomNavbar() {
 
         </div>
       )}
+      <Toaster />
     </div>
   );
 }

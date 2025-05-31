@@ -65,7 +65,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const handleWishlist = async () => {
     if (!session) {
       runOrQueueAction(() => {})
-      toast.info("You need to login to use wishlist.")
+      toast.error("Please sign in to use wishlist")
       return
     }
     setLoading(true)
@@ -75,24 +75,46 @@ export default function ProductCard({ product }: { product: Product }) {
         // Re-fetch wishlist status to ensure correct state (handles Google login edge case)
         const check = await axios.get("/api/users/wishlist", { params: { productId: product._id } })
         setIsWishlisted(check.data.isWishlisted)
+        toast.success(check.data.isWishlisted ? "Added to wishlist" : "Removed from wishlist")
       }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      toast.error(`Failed to update wishlist: ${errorMessage}`)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleBuyNow = () => {
+  const handleAddToCart = () => {
     runOrQueueAction(async () => {
-      // Call your add-to-cart API and redirect to cart/checkout
-      await axios.post("/api/users/cart", { productId: product._id })
-      window.location.href = "/cart"
+      try {
+        await axios.post("/api/users/cart", { productId: product._id })
+        toast.success("Item added to cart!")
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          toast.error("Please sign in to add items to cart")
+        } else {
+          const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+          toast.error(`Failed to add to cart: ${errorMessage}`)
+        }
+      }
     })
   }
 
-  const handleAddToCart = () => {
+  const handleBuyNow = () => {
     runOrQueueAction(async () => {
-      await axios.post("/api/users/cart", { productId: product._id })
-      // Optionally show a toast or feedback
+      try {
+        await axios.post("/api/users/cart", { productId: product._id })
+        toast.success("Item added to cart!")
+        window.location.href = "/cart"
+      } catch (error) {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          toast.error("Please sign in to add items to cart")
+        } else {
+          const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+          toast.error(`Failed to add to cart: ${errorMessage}`)
+        }
+      }
     })
   }
   return (

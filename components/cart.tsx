@@ -60,11 +60,19 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
   }, [isOpen, fetchCartItems]);
 
   const handleQuantityChange = async (productId: string, delta: number) => {
+    if (!session) {
+      toast.error('Please sign in to update cart');
+      return;
+    }
+
     const item = cartItems.find(i => i._id === productId);
     if (!item) return;
 
     const newQuantity = item.quantity + delta;
-    if (newQuantity < 1 || newQuantity > 10) return;
+    if (newQuantity < 1 || newQuantity > 10) {
+      toast.error('Quantity must be between 1 and 10');
+      return;
+    }
 
     try {
       await axios.patch('/api/users/cart', { productId, quantity: newQuantity });
@@ -75,9 +83,14 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
             : item
         )
       );
+      toast.success(`Updated quantity to ${newQuantity}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      toast.error(`Failed to update quantity: ${errorMessage}`);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error('Please sign in to update cart');
+      } else {
+        toast.error(`Failed to update quantity: ${errorMessage}`);
+      }
     }
   };
 
