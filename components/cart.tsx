@@ -29,7 +29,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
   const { data: session } = useSession();
 
   const fetchCartItems = useCallback(async () => {
-    if (!session) {
+    if (!session?.user) {
       setCartItems([]);
       return;
     }
@@ -37,7 +37,10 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
     setLoading(true);
     try {
       const response = await axios.get('/api/users/cart', {
-        withCredentials: true
+        withCredentials: true,
+        headers: {
+          'Content-Type': 'application/json',
+        }
       });
       setCartItems(response.data || []);
     } catch (error) {

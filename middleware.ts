@@ -14,8 +14,9 @@ export function middleware(request: NextRequest) {
 
   // Protect cart API routes
   if (path.startsWith("/api/users/cart")) {
-    const session = request.cookies.get("next-auth.session-token")?.value;
-    if (!session) {
+    const sessionToken = request.cookies.get("next-auth.session-token")?.value || 
+                       request.cookies.get("__Secure-next-auth.session-token")?.value;
+    if (!sessionToken) {
       return new NextResponse(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: {
