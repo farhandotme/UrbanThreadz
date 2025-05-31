@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/DB/dbConfig";
-import User from "@/models/userModels";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import userModels from "@/models/userModels";
@@ -139,7 +138,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Invalid quantity" }, { status: 400 });
     }
 
-    const user = await User.findOne({ email: session.user.email });
+    const user = await userModels.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -189,7 +188,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Product ID required" }, { status: 400 });
     }
 
-    const user = await User.findOne({ email: session.user.email });
+    const user = await userModels.findOne({ email: session.user.email });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
