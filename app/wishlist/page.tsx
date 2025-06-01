@@ -46,14 +46,14 @@ export default function WishlistPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--background)]">
       <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-10 mt-15">
-        <h1 className="text-3xl font-bold mb-6">Your Wishlist</h1>
+        <h1 className="text-3xl font-bold mb-6 text-[var(--foreground)]">Your Wishlist</h1>
         {loading ? (
-          <div className="text-center py-20 text-gray-400">Loading...</div>
+          <div className="text-center py-20 text-[var(--secondary)]">Loading...</div>
         ) : products.length === 0 ? (
-          <div className="text-center py-20 text-gray-400">No products in wishlist.</div>
+          <div className="text-center py-20 text-[var(--secondary)]">No products in wishlist.</div>
         ) : (
           <ProductsGrid products={products} />
         )}

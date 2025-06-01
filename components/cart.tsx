@@ -178,14 +178,14 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                 leaveTo="translate-x-full"
               >
                 <Dialog.Panel className="pointer-events-auto w-screen max-w-md">
-                  <div className="flex h-full flex-col overflow-y-scroll bg-white shadow-xl">
+                  <div className="flex h-full flex-col overflow-y-scroll bg-[var(--background)] shadow-xl">
                     <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
                       <div className="flex items-start justify-between">
-                        <Dialog.Title className="text-lg font-medium text-gray-900">Shopping cart</Dialog.Title>
+                        <Dialog.Title className="text-lg font-medium text-[var(--foreground)]">Shopping cart</Dialog.Title>
                         <div className="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            className="relative -m-2 p-2 text-gray-400 hover:text-gray-500"
+                            className="relative -m-2 p-2 text-[var(--secondary)] hover:text-[var(--foreground)]"
                             onClick={onClose}
                           >
                             <span className="absolute -inset-0.5" />
@@ -202,55 +202,55 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                               {[...Array(3)].map((_, i) => (
                                 <div key={i} className="flex py-6 animate-pulse">
                                   {/* Product image skeleton */}
-                                  <div className="h-24 w-24 flex-shrink-0 rounded-md bg-gray-200" />
+                                  <div className="h-24 w-24 flex-shrink-0 rounded-md bg-[var(--neutral)]" />
                                   
                                   <div className="ml-4 flex flex-1 flex-col">
                                     {/* Product details skeleton */}
                                     <div className="flex justify-between mb-4">
                                       <div className="space-y-3 flex-1">
-                                        <div className="h-4 bg-gray-200 rounded w-3/4" />
-                                        <div className="h-3 bg-gray-200 rounded w-1/2" />
+                                        <div className="h-4 bg-[var(--neutral)] rounded w-3/4" />
+                                        <div className="h-3 bg-[var(--neutral)] rounded w-1/2" />
                                       </div>
-                                      <div className="h-4 w-16 bg-gray-200 rounded ml-4" />
+                                      <div className="h-4 w-16 bg-[var(--neutral)] rounded ml-4" />
                                     </div>
                                     
                                     {/* Actions skeleton */}
                                     <div className="flex items-end justify-between mt-auto">
                                       <div className="flex items-center space-x-2">
-                                        <div className="h-8 w-8 bg-gray-200 rounded" />
-                                        <div className="h-6 w-8 bg-gray-200 rounded" />
-                                        <div className="h-8 w-8 bg-gray-200 rounded" />
+                                        <div className="h-8 w-8 bg-[var(--neutral)] rounded" />
+                                        <div className="h-6 w-8 bg-[var(--neutral)] rounded" />
+                                        <div className="h-8 w-8 bg-[var(--neutral)] rounded" />
                                       </div>
-                                      <div className="h-8 w-8 bg-gray-200 rounded" />
+                                      <div className="h-8 w-8 bg-[var(--neutral)] rounded" />
                                     </div>
                                   </div>
                                 </div>
                               ))}
                               {/* Skeleton footer */}
-                              <div className="border-t border-gray-200 pt-6 mt-6">
+                              <div className="border-t border-[var(--border)] pt-6 mt-6">
                                 <div className="flex justify-between mb-4">
-                                  <div className="h-4 w-20 bg-gray-200 rounded" />
-                                  <div className="h-4 w-24 bg-gray-200 rounded" />
+                                  <div className="h-4 w-20 bg-[var(--neutral)] rounded" />
+                                  <div className="h-4 w-24 bg-[var(--neutral)] rounded" />
                                 </div>
-                                <div className="h-10 w-full bg-gray-200 rounded mt-4" />
+                                <div className="h-10 w-full bg-[var(--neutral)] rounded mt-4" />
                               </div>
                             </div>
                           ) : cartItems.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16">
-                              <ShoppingCart className="h-16 w-16 text-gray-400 mb-4" />
-                              <p className="text-gray-500 text-lg mb-8">Your cart is empty</p>
+                              <ShoppingCart className="h-16 w-16 text-[var(--secondary)] mb-4" />
+                              <p className="text-[var(--secondary)] text-lg mb-8">Your cart is empty</p>
                               <button
                                 onClick={onClose}
-                                className="inline-flex items-center px-4 py-2 border border-black text-sm font-medium rounded-md text-black hover:bg-black hover:text-white transition-colors"
+                                className="inline-flex items-center px-4 py-2 border border-[var(--foreground)] text-sm font-medium rounded-md text-[var(--foreground)] hover:bg-[var(--foreground)] hover:text-[var(--background)] transition-colors"
                               >
                                 Continue Shopping
                               </button>
                             </div>
                           ) : (
-                            <ul role="list" className="-my-6 divide-y divide-gray-200">
+                            <ul role="list" className="-my-6 divide-y divide-[var(--border)]">
                               {cartItems.map((item) => (
                                 <li key={item._id} className="flex py-6">
-                                  <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+                                  <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-[var(--border)]">
                                     <Image
                                       src={item.images[0].url}
                                       alt={item.name}
@@ -261,7 +261,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
 
                                   <div className="ml-4 flex flex-1 flex-col">
                                     <div>
-                                      <div className="flex justify-between text-base font-medium text-gray-900">
+                                      <div className="flex justify-between text-base font-medium text-[var(--foreground)]">
                                         <h3>{item.name}</h3>
                                         <p className="ml-4">₹{item.discountedPrice || item.price}</p>
                                       </div>
@@ -271,15 +271,15 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                                         <button
                                           onClick={() => handleQuantityChange(item._id, -1)}
                                           disabled={item.quantity === 1}
-                                          className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                          className="p-1 rounded-full hover:bg-[var(--neutral)] disabled:opacity-50 text-[var(--foreground)]"
                                         >
                                           <Minus className="h-4 w-4" />
                                         </button>
-                                        <span className="font-medium">{item.quantity}</span>
+                                        <span className="font-medium text-[var(--foreground)]">{item.quantity}</span>
                                         <button
                                           onClick={() => handleQuantityChange(item._id, 1)}
                                           disabled={item.quantity === 10}
-                                          className="p-1 rounded-full hover:bg-gray-100 disabled:opacity-50"
+                                          className="p-1 rounded-full hover:bg-[var(--neutral)] disabled:opacity-50 text-[var(--foreground)]"
                                         >
                                           <Plus className="h-4 w-4" />
                                         </button>
@@ -303,27 +303,27 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                     </div>
 
                     {cartItems.length > 0 && (
-                      <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                        <div className="flex justify-between text-base font-medium text-gray-900">
+                      <div className="border-t border-[var(--border)] px-4 py-6 sm:px-6">
+                        <div className="flex justify-between text-base font-medium text-[var(--foreground)]">
                           <p>Subtotal</p>
                           <p>₹{calculateSubtotal().toLocaleString('en-IN')}</p>
                         </div>
-                        <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
+                        <p className="mt-0.5 text-sm text-[var(--secondary)]">Shipping and taxes calculated at checkout.</p>
                         <div className="mt-6">
                           <button
                             type="button"
                             onClick={handleCheckout}
-                            className="w-full flex items-center justify-center rounded-md border border-transparent bg-black px-6 py-3 text-base font-medium text-white shadow-sm hover:opacity-90"
+                            className="w-full flex items-center justify-center rounded-md border border-transparent bg-[var(--primary)] px-6 py-3 text-base font-medium text-[var(--primary-foreground)] shadow-sm hover:opacity-90"
                           >
                             Checkout
                           </button>
                         </div>
-                        <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
+                        <div className="mt-6 flex justify-center text-center text-sm text-[var(--secondary)]">
                           <p>
                             or{' '}
                             <button
                               type="button"
-                              className="font-medium text-black hover:opacity-80"
+                              className="font-medium text-[var(--foreground)] hover:opacity-80"
                               onClick={onClose}
                             >
                               Continue Shopping

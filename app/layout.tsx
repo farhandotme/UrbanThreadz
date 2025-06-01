@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
 import { AuthActionProvider } from "@/components/AuthActionContext";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "UrbanThreadz",
@@ -20,9 +21,11 @@ export default function RootLayout({
   return (
     <SessionWrapper>
       <AuthActionProvider>
-        <html lang="en">
-          <body className="relative">{children}</body>
-        </html>
+        <ThemeProvider>
+          <html lang="en">
+            <body className="relative">{children}</body>
+          </html>
+        </ThemeProvider>
       </AuthActionProvider>
     </SessionWrapper>
   );

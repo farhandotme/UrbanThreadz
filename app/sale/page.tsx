@@ -104,10 +104,10 @@ export default function SalePage() {
   const PriceRangeSlider = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Price Range</h3>
+        <h3 className="text-lg font-semibold text-[var(--foreground)]">Price Range</h3>
         <button
           onClick={resetFilters}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-1 text-sm text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
           Reset
@@ -116,23 +116,23 @@ export default function SalePage() {
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 shadow-sm">
-            <span className="text-sm font-medium text-gray-900">₹{priceRange[0].toLocaleString("en-IN")}</span>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg px-4 py-2 shadow-sm">
+            <span className="text-sm font-medium text-[var(--card-foreground)]">₹{priceRange[0].toLocaleString("en-IN")}</span>
           </div>
-          <div className="text-gray-400 text-sm">to</div>
-          <div className="bg-white border border-gray-200 rounded-lg px-4 py-2 shadow-sm">
-            <span className="text-sm font-medium text-gray-900">₹{priceRange[1].toLocaleString("en-IN")}</span>
+          <div className="text-[var(--secondary)] text-sm">to</div>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-lg px-4 py-2 shadow-sm">
+            <span className="text-sm font-medium text-[var(--card-foreground)]">₹{priceRange[1].toLocaleString("en-IN")}</span>
           </div>
         </div>
 
         <div className="relative px-2 py-4">
           <div className="relative h-2">
             {/* Track */}
-            <div className="absolute w-full h-2 bg-gray-100 rounded-full" />
+            <div className="absolute w-full h-2 bg-[var(--neutral)] rounded-full" />
 
             {/* Active range */}
             <div
-              className="absolute h-2 bg-gray-900 rounded-full transition-all duration-200"
+              className="absolute h-2 bg-[var(--primary)] rounded-full transition-all duration-200"
               style={{
                 left: `${((priceRange[0] - minPrice) / (maxPrice - minPrice)) * 100}%`,
                 width: `${((priceRange[1] - priceRange[0]) / (maxPrice - minPrice)) * 100}%`,
@@ -167,25 +167,25 @@ export default function SalePage() {
   )
 
   return (
-    <div className="min-h-screen bg-white mt-20">
+    <div className="min-h-screen bg-[var(--background)] mt-20">
       <Navbar />
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-100">
+      <div className="bg-[var(--background)] border-b border-[var(--border)]">
         <div className="max-w-8xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-              <p className="text-gray-600 mt-1">Discover our curated collection</p>
+              <h1 className="text-3xl font-bold text-[var(--foreground)]">Products</h1>
+              <p className="text-[var(--secondary)] mt-1">Discover our curated collection</p>
             </div>
             <motion.div
               key={animateCount}
               initial={{ scale: 1.1, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="hidden sm:flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full"
+              className="hidden sm:flex items-center gap-2 bg-[var(--foreground)] text-[var(--background)] px-4 py-2 rounded-full"
             >
               <span className="text-sm font-medium">{filteredProducts.length}</span>
-              <span className="text-sm text-gray-300">items</span>
+              <span className="text-sm text-[var(--secondary-foreground)]">items</span>
             </motion.div>
           </div>
         </div>
@@ -195,20 +195,20 @@ export default function SalePage() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block w-64 flex-shrink-0 mr-4">
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm sticky top-8">
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 shadow-sm sticky top-8">
               <PriceRangeSlider />
 
               {/* Tags Filter */}
               <div className="mt-6 space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">Categories</h3>
+                <h3 className="text-lg font-semibold text-[var(--card-foreground)]">Categories</h3>
                 <div className="space-y-2">
                   {allTags.map((tag) => (
                     <button
                       key={tag}
                       onClick={() => toggleTag(tag)}
                       className={`w-full text-left px-3 py-2 rounded-lg border transition-all duration-200 ${selectedTags.includes(tag)
-                        ? "bg-gray-900 text-white border-gray-900 shadow-sm"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                        ? "bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)] shadow-sm"
+                        : "bg-[var(--card)] text-[var(--card-foreground)] border-[var(--border)] hover:border-[var(--foreground)] hover:bg-[var(--neutral)]"
                         }`}
                     >
                       <span className="font-medium">{tag}</span>
@@ -227,15 +227,15 @@ export default function SalePage() {
                   key={animateCount}
                   initial={{ scale: 1.1, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="flex items-center gap-2 bg-gray-900 text-white px-3 py-1.5 rounded-full"
+                  className="flex items-center gap-2 bg-[var(--foreground)] text-[var(--background)] px-3 py-1.5 rounded-full"
                 >
                   <span className="text-sm font-medium">{filteredProducts.length}</span>
-                  <span className="text-xs text-gray-300">items</span>
+                  <span className="text-xs text-[var(--secondary-foreground)]">items</span>
                 </motion.div>
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 border border-[var(--border)] rounded-lg hover:bg-[var(--neutral)] transition-colors text-[var(--foreground)]"
               >
                 {showFilters ? <X className="w-5 h-5" /> : <Filter className="w-5 h-5" />}
                 <span className="font-medium">Filters</span>
@@ -251,19 +251,19 @@ export default function SalePage() {
                   exit={{ opacity: 0, height: 0 }}
                   className="mb-6 overflow-hidden"
                 >
-                  <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
+                  <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 shadow-sm">
                     <PriceRangeSlider />
 
                     <div className="mt-8 space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Categories</h3>
+                      <h3 className="text-lg font-semibold text-[var(--card-foreground)]">Categories</h3>
                       <div className="grid grid-cols-2 gap-2">
                         {allTags.map((tag) => (
                           <button
                             key={tag}
                             onClick={() => toggleTag(tag)}
                             className={`px-3 py-2 rounded-lg border text-sm font-medium transition-all duration-200 ${selectedTags.includes(tag)
-                              ? "bg-gray-900 text-white border-gray-900"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-300"
+                              ? "bg-[var(--primary)] text-[var(--primary-foreground)] border-[var(--primary)]"
+                              : "bg-[var(--card)] text-[var(--card-foreground)] border-[var(--border)] hover:border-[var(--foreground)]"
                               }`}
                           >
                             {tag}
@@ -283,11 +283,11 @@ export default function SalePage() {
               {loading ? (
                 <div className="flex flex-col justify-center items-center h-96 gap-6">
                   <div className="relative">
-                    <div className="w-12 h-12 border-3 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
+                    <div className="w-12 h-12 border-3 border-[var(--neutral)] border-t-[var(--primary)] rounded-full animate-spin" />
                   </div>
                   <div className="text-center">
-                    <p className="text-xl font-semibold text-gray-900 mb-2">Loading Products</p>
-                    <p className="text-gray-500">Finding the perfect items for you...</p>
+                    <p className="text-xl font-semibold text-[var(--foreground)] mb-2">Loading Products</p>
+                    <p className="text-[var(--secondary)]">Finding the perfect items for you...</p>
                   </div>
                 </div>
               ) : error ? (
@@ -296,7 +296,7 @@ export default function SalePage() {
                   animate={{ scale: 1, opacity: 1 }}
                   className="text-center py-16"
                 >
-                  <div className="bg-red-50 border border-red-100 rounded-2xl p-8 max-w-md mx-auto">
+                  <div className="bg-red-50 border border-red-100 rounded-2xl p-8 max-w-md mx-auto"> {/* Keep error specific colors */}
                     <p className="text-red-900 font-semibold text-lg mb-2">Something went wrong</p>
                     <p className="text-red-700">{error}</p>
                   </div>
@@ -307,12 +307,12 @@ export default function SalePage() {
                   animate={{ scale: 1, opacity: 1 }}
                   className="text-center py-16"
                 >
-                  <div className="bg-gray-50 border border-gray-100 rounded-2xl p-8 max-w-md mx-auto">
-                    <p className="text-gray-900 font-semibold text-xl mb-2">No products found</p>
-                    <p className="text-gray-600 mb-6">Try adjusting your filters to see more results</p>
+                  <div className="bg-[var(--neutral)] border border-[var(--border)] rounded-2xl p-8 max-w-md mx-auto">
+                    <p className="text-[var(--foreground)] font-semibold text-xl mb-2">No products found</p>
+                    <p className="text-[var(--secondary)] mb-6">Try adjusting your filters to see more results</p>
                     <button
                       onClick={resetFilters}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-lg hover:bg-[var(--primary)]/90 transition-colors font-medium"
                     >
                       <RotateCcw className="w-4 h-4" />
                       Reset Filters
@@ -333,9 +333,9 @@ export default function SalePage() {
           height: 24px;
           width: 24px;
           border-radius: 50%;
-          background: #ffffff;
+          background: var(--card);
           cursor: pointer;
-          border: 3px solid #111827;
+          border: 3px solid var(--primary);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           transition: all 0.2s ease;
         }
@@ -353,9 +353,9 @@ export default function SalePage() {
           height: 24px;
           width: 24px;
           border-radius: 50%;
-          background: #ffffff;
+          background: var(--card);
           cursor: pointer;
-          border: 3px solid #111827;
+          border: 3px solid var(--primary);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           transition: all 0.2s ease;
         }

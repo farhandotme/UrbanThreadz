@@ -6,7 +6,8 @@ import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { ChevronDown, Heart, Menu, Search, ShoppingCart, User, X } from 'lucide-react';
+import { ChevronDown, Heart, Menu, Search, ShoppingCart, User, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/components/ThemeProvider';
 
 import Cart from './cart';
 import { toast, Toaster } from 'sonner';
@@ -37,6 +38,7 @@ export default function TshirtEcomNavbar() {
   const [wishlistCount, setWishlistCount] = useState<number>(0);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const { theme, toggleTheme } = useTheme();
 
   const categories = [
     { id: 1, name: 'New Arrivals', subcategories: ['This Week', 'This Month', 'Trending'], path: '/new-arrivals' },
@@ -133,18 +135,18 @@ export default function TshirtEcomNavbar() {
   };
   if (!isMounted) {
     return (
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]">
 
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="block lg:hidden">
-              <button className="text-black focus:outline-none">
+              <button className="text-[var(--foreground)] focus:outline-none">
                 <Menu size={24} />
               </button>
             </div>
 
             <div className="flex-shrink-0">
-              <Link href="/" className="text-2xl font-extrabold text-black tracking-tighter inline-block">
+              <Link href="/" className="text-2xl font-extrabold text-[var(--foreground)] tracking-tighter inline-block">
                 UrbanThreadz
               </Link>
             </div>
@@ -152,7 +154,7 @@ export default function TshirtEcomNavbar() {
             <div className="hidden lg:flex items-center space-x-10">
               {categories.map((category) => (
                 <div key={category.id} className="relative group">
-                  <Link href={category.path} className="text-gray-800 flex items-center text-sm font-medium uppercase tracking-wide">
+                  <Link href={category.path} className="text-[var(--neutral-foreground)] flex items-center text-sm font-medium uppercase tracking-wide">
                     {category.name}
                     <ChevronDown size={16} className="ml-1" />
                   </Link>
@@ -161,9 +163,9 @@ export default function TshirtEcomNavbar() {
             </div>
 
             <div className="flex items-center space-x-6">
-              <Link href="/search" className="text-gray-700"><Search size={20} /></Link>
+              <Link href="/search" className="text-[var(--secondary)]"><Search size={20} /></Link>
               <button
-                className="text-gray-700 hover:text-black transition-colors relative"
+                className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
                 onClick={() => {
                   if (status !== "authenticated") {
                     setIsAuthModalOpen(true)
@@ -175,11 +177,11 @@ export default function TshirtEcomNavbar() {
               >
                 <Heart size={20} />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">{wishlistCount}</span>
+                  <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center">{wishlistCount}</span>
                 )}
               </button>
-              <button onClick={() => setIsAuthModalOpen(true)} className="text-gray-700"><User size={20} /></button>
-              <Link href="/cart" className="text-gray-700 relative"><ShoppingCart size={20} /></Link>
+              <button onClick={() => setIsAuthModalOpen(true)} className="text-[var(--secondary)]"><User size={20} /></button>
+              <Link href="/cart" className="text-[var(--secondary)] relative"><ShoppingCart size={20} /></Link>
             </div>
           </div>
         </div>
@@ -188,7 +190,7 @@ export default function TshirtEcomNavbar() {
   }
 
   return (
-    <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md' : 'bg-white'}`}>
+    <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[var(--background)] shadow-md' : 'bg-[var(--background)]'}`}>
 
       <div className="container mx-auto px-4">
         <AuthModal
@@ -199,14 +201,14 @@ export default function TshirtEcomNavbar() {
           <div className="block lg:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-black hover:text-gray-600 focus:outline-none transition-colors"
+              className="text-[var(--foreground)] hover:text-[var(--secondary)] focus:outline-none transition-colors"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
           <div className="flex-shrink-0">
-            <Link href="/" className="text-2xl font-extrabold text-black tracking-tighter inline-block">
+            <Link href="/" className="text-2xl font-extrabold text-[var(--foreground)] tracking-tighter inline-block">
               UrbanThreadz
             </Link>
           </div>
@@ -215,11 +217,11 @@ export default function TshirtEcomNavbar() {
             {categories.map((category) => (
               <div key={category.id} className="relative group">
                 <div className="flex items-center">
-                  <Link href={category.path} className="text-gray-800 hover:text-black text-sm font-medium transition-colors uppercase tracking-wide">
+                  <Link href={category.path} className="text-[var(--neutral-foreground)] hover:text-[var(--foreground)] text-sm font-medium transition-colors uppercase tracking-wide">
                     {category.name}
                   </Link>
                   <button
-                    className="ml-1 text-gray-800 hover:text-black focus:outline-none"
+                    className="ml-1 text-[var(--neutral-foreground)] hover:text-[var(--foreground)] focus:outline-none"
                     onClick={(e) => toggleDropdown(e, category.id)}
                     aria-label={`Toggle ${category.name} dropdown`}
                   >
@@ -229,14 +231,14 @@ export default function TshirtEcomNavbar() {
 
                 {activeCategory === category.id && (
                   <div
-                    className="absolute top-full left-0 w-48 bg-white shadow-lg py-3 mt-1 z-50 border-t-2 border-black"
+                    className="absolute top-full left-0 w-48 bg-[var(--card)] shadow-lg py-3 mt-1 z-50 border-t-2 border-[var(--foreground)]"
                     onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
                   >
                     {category.subcategories.map((subcategory, idx) => (
                       <Link
                         key={idx}
                         href={`${category.path}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="block px-5 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-black transition-colors"
+                        className="block px-5 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] hover:text-[var(--foreground)] transition-colors"
                         onClick={() => setActiveCategory(null)} // Close dropdown after selection
                       >
                         {subcategory}
@@ -255,7 +257,7 @@ export default function TshirtEcomNavbar() {
               <div className={`flex items-center ${isSearchExpanded ? 'w-48' : 'w-8'} transition-all duration-300`}>
                 <button
                   onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-                  className="text-gray-700 hover:text-black focus:outline-none transition-colors"
+                  className="text-[var(--secondary)] hover:text-[var(--foreground)] focus:outline-none transition-colors"
                 >
                   <Search size={20} />
                 </button>
@@ -263,17 +265,26 @@ export default function TshirtEcomNavbar() {
                   <input
                     type="text"
                     placeholder="Search tees..."
-                    className="ml-2 w-full border-b border-gray-300 focus:outline-none focus:border-black text-sm py-1 bg-transparent"
+                    className="ml-2 w-full border-b border-[var(--border)] focus:outline-none focus:border-[var(--foreground)] text-sm py-1 bg-transparent text-[var(--foreground)] placeholder:text-[var(--secondary)]"
                     autoFocus
                   />
                 )}
               </div>
             </div>
 
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="text-[var(--secondary)] hover:text-[var(--foreground)] focus:outline-none transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
+
             {/* Wishlist */}
             <button
               type="button"
-              className="text-gray-700 hover:text-black transition-colors relative"
+              className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
               onClick={() => {
                 if (status === "authenticated") {
                   window.location.href = "/wishlist";
@@ -285,7 +296,7 @@ export default function TshirtEcomNavbar() {
             >
               <Heart size={20} />
               {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   {wishlistCount}
                 </span>
               )}
@@ -302,7 +313,7 @@ export default function TshirtEcomNavbar() {
                     setIsAuthModalOpen(true);
                   }
                 }}
-                className="text-gray-700 hover:text-black transition-colors flex items-center"
+                className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors flex items-center"
               >
                 {status === "authenticated" && session?.user ? (
                   <div className="relative">
@@ -321,28 +332,28 @@ export default function TshirtEcomNavbar() {
 
               {/* Profile Dropdown Menu */}
               {showProfileMenu && status === "authenticated" && session?.user && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-1 z-50 border border-gray-200">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">{session.user.name || "User"}</p>
-                    <p className="text-xs text-gray-500 truncate">{session.user.email || ""}</p>
+                <div className="absolute right-0 mt-2 w-48 bg-[var(--card)] shadow-lg rounded-md py-1 z-50 border border-[var(--border)]">
+                  <div className="px-4 py-3 border-b border-[var(--border)]">
+                    <p className="text-sm font-medium text-[var(--card-foreground)]">{session.user.name || "User"}</p>
+                    <p className="text-xs text-[var(--secondary)] truncate">{session.user.email || ""}</p>
                   </div>
                   <Link
                     href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
                     onClick={() => setShowProfileMenu(false)}
                   >
                     Your Profile
                   </Link>
                   <Link
                     href="/orders"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
                     onClick={() => setShowProfileMenu(false)}
                   >
                     Your Orders
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[var(--neutral)]"
                   >
                     Sign out
                   </button>
@@ -351,13 +362,13 @@ export default function TshirtEcomNavbar() {
             </div>
 
             {/* Cart */}
-            <button 
+            <button
               onClick={() => setIsCartOpen(true)}
-              className="text-gray-700 hover:text-black transition-colors relative"
+              className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
             >
               <ShoppingCart size={20} />
               {cartItemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
                   {cartItemCount}
                 </span>
               )}
@@ -369,29 +380,29 @@ export default function TshirtEcomNavbar() {
 
       {/* Mobile Menu - Black and white theme */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg">
+        <div className="lg:hidden bg-[var(--background)] border-t border-[var(--border)] shadow-lg">
           <div className="px-4 py-3">
             <div className="relative">
-              <Search size={18} className="absolute left-3 top-2.5 text-gray-400" />
+              <Search size={18} className="absolute left-3 top-2.5 text-[var(--secondary)]" />
               <input
                 type="text"
                 placeholder="Find your perfect tee..."
-                className="w-full border border-gray-200 rounded-none pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
+                className="w-full border border-[var(--border)] rounded-none pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--ring)] bg-transparent text-[var(--foreground)] placeholder:text-[var(--secondary)]"
               />
             </div>
           </div>
-          <div className="border-t border-gray-100">
+          <div className="border-t border-[var(--border)]">
             {categories.map((category) => (
               <div key={category.id}>
                 <div className="flex items-center justify-between w-full px-4 py-3">
                   <Link
                     href={category.path}
-                    className="text-sm font-medium text-gray-700 hover:text-black transition-colors uppercase"
+                    className="text-sm font-medium text-[var(--neutral-foreground)] hover:text-[var(--foreground)] transition-colors uppercase"
                   >
                     {category.name}
                   </Link>
                   <button
-                    className="text-gray-700 hover:text-black"
+                    className="text-[var(--neutral-foreground)] hover:text-[var(--foreground)]"
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveCategory(activeCategory === category.id ? null : category.id);
@@ -402,12 +413,12 @@ export default function TshirtEcomNavbar() {
                   </button>
                 </div>
                 {activeCategory === category.id && (
-                  <div className="bg-gray-50 pl-8 py-1">
+                  <div className="bg-[var(--neutral)] pl-8 py-1">
                     {category.subcategories.map((subcategory, idx) => (
                       <Link
                         key={idx}
                         href={`${category.path}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="block px-4 py-2 text-sm text-gray-600 hover:text-black"
+                        className="block px-4 py-2 text-sm text-[var(--neutral-foreground)] hover:text-[var(--foreground)]"
                         onClick={() => {
                           setActiveCategory(null);
                           setIsMobileMenuOpen(false);
@@ -422,9 +433,20 @@ export default function TshirtEcomNavbar() {
             ))}
           </div>
           <div className="border-t border-gray-200 py-4 px-4 flex items-center space-x-6">
+            {/* Theme Toggle Button - Mobile */}
+            <button
+              onClick={() => {
+                toggleTheme();
+                setIsMobileMenuOpen(false); // Optionally close menu on theme change
+              }}
+              className="text-[var(--secondary)] hover:text-[var(--foreground)] focus:outline-none transition-colors"
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+            </button>
             <button
               type="button"
-              className="text-gray-700 hover:text-black transition-colors relative"
+              className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
               onClick={() => {
                 if (status === "authenticated") {
                   window.location.href = "/wishlist";
@@ -436,7 +458,7 @@ export default function TshirtEcomNavbar() {
             >
               <Heart size={20} />
               {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   {wishlistCount}
                 </span>
               )}
@@ -453,7 +475,7 @@ export default function TshirtEcomNavbar() {
                     setIsAuthModalOpen(true);
                   }
                 }}
-                className="text-gray-700 hover:text-black transition-colors"
+                className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
               >
                 {status === "authenticated" && session?.user ? (
                   <Image
@@ -470,14 +492,14 @@ export default function TshirtEcomNavbar() {
 
               {/* Mobile Profile Dropdown */}
               {showProfileMenu && status === "authenticated" && session?.user && (
-                <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-md py-1 z-50 border border-gray-200">
-                  <div className="px-4 py-3 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">{session.user.name || "User"}</p>
-                    <p className="text-xs text-gray-500 truncate">{session.user.email || ""}</p>
+                <div className="absolute right-0 mt-2 w-48 bg-[var(--card)] shadow-lg rounded-md py-1 z-50 border border-[var(--border)]">
+                  <div className="px-4 py-3 border-b border-[var(--border)]">
+                    <p className="text-sm font-medium text-[var(--card-foreground)]">{session.user.name || "User"}</p>
+                    <p className="text-xs text-[var(--secondary)] truncate">{session.user.email || ""}</p>
                   </div>
                   <Link
                     href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
                     onClick={() => {
                       setShowProfileMenu(false);
                       setIsMobileMenuOpen(false);
@@ -487,7 +509,7 @@ export default function TshirtEcomNavbar() {
                   </Link>
                   <Link
                     href="/orders"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
                     onClick={() => {
                       setShowProfileMenu(false);
                       setIsMobileMenuOpen(false);
@@ -497,7 +519,7 @@ export default function TshirtEcomNavbar() {
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[var(--neutral)]"
                   >
                     Sign out
                   </button>

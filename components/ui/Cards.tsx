@@ -122,12 +122,12 @@ export default function ProductCard({ product }: { product: Product }) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.04, boxShadow: "0 8px 32px rgba(0,0,0,0.10)" }}
-      className="group relative bg-white border border-gray-200 rounded-xl shadow-md transition-all duration-300 p-2 sm:p-3 overflow-hidden h-[380px] sm:h-[400px] w-full max-w-[280px] sm:max-w-[380px] mx-auto flex flex-col hover:z-20"
+      className="group relative bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-md transition-all duration-300 p-2 sm:p-3 overflow-hidden h-[380px] sm:h-[400px] w-full max-w-[280px] sm:max-w-[380px] mx-auto flex flex-col hover:z-20"
       onMouseEnter={() => setShowDetails(true)}
       onMouseLeave={() => setShowDetails(false)}
     >
       {/* Image */}
-      <div className="relative w-full h-[240px] sm:h-[260px] mb-2 sm:mb-3 overflow-hidden rounded-lg border border-gray-100 bg-gray-50 flex items-center justify-center">
+      <div className="relative w-full h-[240px] sm:h-[260px] mb-2 sm:mb-3 overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--neutral)] flex items-center justify-center">
         <Image
           src={mainImage.url || "/placeholder.svg"}
           alt={mainImage.alt}
@@ -136,7 +136,7 @@ export default function ProductCard({ product }: { product: Product }) {
           style={{ objectFit: "cover", objectPosition: "center" }}
         />
         {product.discountPercentage && product.discountPercentage > 0 && (
-          <div className="absolute top-1 left-1 bg-black text-white text-xs font-bold px-1.5 py-0.5 rounded-full shadow">
+          <div className="absolute top-1 left-1 bg-[var(--foreground)] text-[var(--background)] text-xs font-bold px-1.5 py-0.5 rounded-full shadow">
             -{product.discountPercentage}%
           </div>
         )}
@@ -144,13 +144,13 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Content */}
       <div className="flex-1 flex flex-col justify-between min-h-0">
         <div className="overflow-hidden">
-          <h2 className="text-sm sm:text-base font-semibold text-gray-900 mb-1 line-clamp-1 tracking-tight">
+          <h2 className="text-sm sm:text-base font-semibold text-[var(--card-foreground)] mb-1 line-clamp-1 tracking-tight">
             {product.name}
           </h2>
-          <p className="text-xs text-gray-500 mb-1 line-clamp-2">{product.shortDescription}</p>
+          <p className="text-xs text-[var(--secondary)] mb-1 line-clamp-2">{product.shortDescription}</p>
         </div>
         <div className="flex items-end gap-2 mt-1">
-          <span className="text-base sm:text-lg font-bold text-black">
+          <span className="text-base sm:text-lg font-bold text-[var(--card-foreground)]">
             ₹
             {typeof product.discountedPrice === "number"
               ? product.discountedPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -159,7 +159,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {typeof product.discountedPrice === "number" &&
             typeof product.realPrice === "number" &&
             product.discountedPrice < product.realPrice && (
-              <span className="text-xs line-through text-gray-400">
+              <span className="text-xs line-through text-[var(--secondary)]">
                 ₹{product.realPrice.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             )}
@@ -174,23 +174,23 @@ export default function ProductCard({ product }: { product: Product }) {
         initial={{ opacity: 0, y: 20 }}
         animate={showDetails ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
         transition={{ duration: 0.3 }}
-        className={`absolute inset-0 bg-white/95 rounded-xl p-4 flex flex-col justify-between z-20 group-hover:shadow-2xl ${showDetails ? "pointer-events-auto" : "pointer-events-none"}`}
+        className={`absolute inset-0 bg-[var(--card)]/95 rounded-xl p-4 flex flex-col justify-between z-20 group-hover:shadow-2xl ${showDetails ? "pointer-events-auto" : "pointer-events-none"}`}
         style={{ backdropFilter: "blur(2px)" }}
       >
         <div className="w-full flex-1 flex flex-col mt-10 justify-between">
           <div>
-            <h3 className="text-lg font-bold text-black mb-2 text-center">{product.name}</h3>
-            <p className="text-sm text-gray-700 mb-2 text-center line-clamp-4">{product.description}</p>
+            <h3 className="text-lg font-bold text-[var(--card-foreground)] mb-2 text-center">{product.name}</h3>
+            <p className="text-sm text-[var(--secondary)] mb-2 text-center line-clamp-4">{product.description}</p>
             <div className="flex flex-wrap gap-2 justify-center mb-2">
               {product.sizes?.map((size) => (
-                <span key={size.name} className="px-2 py-1 bg-gray-200 rounded text-xs text-gray-700">
+                <span key={size.name} className="px-2 py-1 bg-[var(--neutral)] rounded text-xs text-[var(--neutral-foreground)]">
                   {size.name}
                 </span>
               ))}
             </div>
             <div className="flex flex-wrap gap-2 justify-center mb-4">
               {product.tags?.map((tag) => (
-                <span key={tag} className="px-2 py-1 bg-black text-white rounded text-xs">
+                <span key={tag} className="px-2 py-1 bg-[var(--foreground)] text-[var(--background)] rounded text-xs">
                   {tag}
                 </span>
               ))}
@@ -198,27 +198,27 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
           <div className="flex gap-2 w-full justify-center mt-auto pt-2">
             <button
-              className={`p-2 rounded-full border border-gray-300 bg-white/80 hover:bg-gray-100 transition-colors ${loading ? "opacity-60 pointer-events-none" : ""}`}
+              className={`p-2 rounded-full border border-[var(--border)] bg-[var(--card)]/80 hover:bg-[var(--neutral)] transition-colors ${loading ? "opacity-60 pointer-events-none" : ""}`}
               aria-label="Add to wishlist"
               onClick={handleWishlist}
             >
               <Heart
-                className={`w-6 h-6 ${isWishlisted ? "fill-black text-black animate-pulse" : "text-gray-500"} transition-all`}
+                className={`w-6 h-6 ${isWishlisted ? "fill-[var(--foreground)] text-[var(--foreground)] animate-pulse" : "text-[var(--secondary)]"} transition-all`}
               />
             </button>
             <button
-              className="flex-1 bg-black text-white px-3 py-2 rounded-lg hover:bg-gray-900 transition-colors text-xs font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
+              className="flex-1 bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-2 rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-xs font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
               disabled={!product.isAvailable || product.totalStock === 0}
               onClick={handleBuyNow}
             >
               Buy Now
             </button>
             <button
-              className="p-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--neutral)] transition-colors"
               aria-label="Add to cart"
               onClick={handleAddToCart}
             >
-              <ShoppingCart className="w-5 h-5 text-black" />
+              <ShoppingCart className="w-5 h-5 text-[var(--foreground)]" />
             </button>
           </div>
         </div>
@@ -261,13 +261,13 @@ export function ProductsGrid({ heading, products }: { heading?: string; products
         {[...Array(10)].map((_, i) => (
           <div
             key={i}
-            className="relative bg-white border border-gray-200 rounded-xl shadow-md p-2 sm:p-3 h-[380px] sm:h-[400px] w-full max-w-[280px] sm:max-w-[380px] animate-pulse"
+            className="relative bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-md p-2 sm:p-3 h-[380px] sm:h-[400px] w-full max-w-[280px] sm:max-w-[380px] animate-pulse"
           >
-            <div className="w-full h-[240px] sm:h-[260px] mb-2 sm:mb-3 rounded-lg bg-gray-200" />
+            <div className="w-full h-[240px] sm:h-[260px] mb-2 sm:mb-3 rounded-lg bg-[var(--neutral)]" />
             <div className="space-y-3">
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
-              <div className="h-4 bg-gray-200 rounded w-1/4" />
+              <div className="h-4 bg-[var(--neutral)] rounded w-3/4" />
+              <div className="h-4 bg-[var(--neutral)] rounded w-1/2" />
+              <div className="h-4 bg-[var(--neutral)] rounded w-1/4" />
             </div>
           </div>
         ))}
@@ -275,7 +275,7 @@ export function ProductsGrid({ heading, products }: { heading?: string; products
     )
   }
   if (error) return <div className="text-center text-red-500 py-10">{error}</div>
-  if (!internalProducts.length) return <div className="text-center text-gray-400 py-10">No products found.</div>
+  if (!internalProducts.length) return <div className="text-center text-[var(--secondary)] py-10">No products found.</div>
 
   let displayProducts = internalProducts
   if (heading) {
@@ -283,7 +283,7 @@ export function ProductsGrid({ heading, products }: { heading?: string; products
     const filtered = internalProducts.filter((p) => p.category?.toLowerCase() === heading.toLowerCase())
     displayProducts = filtered.slice(0, 7)
     if (!displayProducts.length)
-      return <div className="text-center text-gray-400 py-10">No products found for this category.</div>
+      return <div className="text-center text-[var(--secondary)] py-10">No products found for this category.</div>
   }
 
   return (

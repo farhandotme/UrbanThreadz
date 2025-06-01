@@ -116,14 +116,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return (
         <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--secondary)] mb-1">
               Email
             </label>
             <input
               type="email"
               placeholder="you@example.com"
               {...loginForm.register("email")}
-              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+              className="block w-full rounded-md border border-[var(--border)] px-4 py-3 focus:border-[var(--foreground)] focus:ring-1 focus:ring-[var(--foreground)] transition-all duration-200 bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--secondary)]"
             />
             {loginForm.formState.errors.email && (
               <p className="mt-1 text-sm text-red-600">{loginForm.formState.errors.email.message}</p>
@@ -131,14 +131,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--secondary)] mb-1">
               Password
             </label>
             <input
               type="password"
               placeholder="Your password"
               {...loginForm.register("password")}
-              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+              className="block w-full rounded-md border border-[var(--border)] px-4 py-3 focus:border-[var(--foreground)] focus:ring-1 focus:ring-[var(--foreground)] transition-all duration-200 bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--secondary)]"
             />
             {loginForm.formState.errors.password && (
               <p className="mt-1 text-sm text-red-600">{loginForm.formState.errors.password.message}</p>
@@ -148,7 +148,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <div className="flex justify-end">
             <button
               type="button"
-              className="text-sm text-gray-600 hover:text-black transition-colors"
+              className="text-sm text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
             >
               Forgot password?
             </button>
@@ -156,7 +156,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
           <button
             type="submit"
-            className="w-full bg-black text-white rounded-md py-3 font-medium hover:bg-gray-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] rounded-md py-3 font-medium hover:bg-[var(--primary)]/90 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]"
           >
             Sign in
           </button>
@@ -166,14 +166,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       return (
         <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--secondary)] mb-1">
               Full Name
             </label>
             <input
               type="text"
               placeholder="John Doe"
               {...registerForm.register("fullname")}
-              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+              className="block w-full rounded-md border border-[var(--border)] px-4 py-3 focus:border-[var(--foreground)] focus:ring-1 focus:ring-[var(--foreground)] transition-all duration-200 bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--secondary)]"
             />
             {registerForm.formState.errors.fullname && (
               <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.fullname.message}</p>
@@ -181,14 +181,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--secondary)] mb-1">
               Email
             </label>
             <input
               type="email"
               placeholder="you@example.com"
               {...registerForm.register("email")}
-              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+              className="block w-full rounded-md border border-[var(--border)] px-4 py-3 focus:border-[var(--foreground)] focus:ring-1 focus:ring-[var(--foreground)] transition-all duration-200 bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--secondary)]"
             />
             {registerForm.formState.errors.email && (
               <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.email.message}</p>
@@ -196,14 +196,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--secondary)] mb-1">
               Password
             </label>
             <input
               type="password"
               placeholder="Create a password"
               {...registerForm.register("password")}
-              className="block w-full rounded-md border border-gray-300 px-4 py-3 focus:border-black focus:ring-1 focus:ring-black transition-all duration-200"
+              className="block w-full rounded-md border border-[var(--border)] px-4 py-3 focus:border-[var(--foreground)] focus:ring-1 focus:ring-[var(--foreground)] transition-all duration-200 bg-[var(--background)] text-[var(--foreground)] placeholder:text-[var(--secondary)]"
             />
             {registerForm.formState.errors.password && (
               <p className="mt-1 text-sm text-red-600">{registerForm.formState.errors.password.message}</p>
@@ -212,7 +212,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
           <button
             type="submit"
-            className="w-full bg-black text-white rounded-md py-3 font-medium hover:bg-gray-800 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-black"
+            className="w-full bg-[var(--primary)] text-[var(--primary-foreground)] rounded-md py-3 font-medium hover:bg-[var(--primary)]/90 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-[var(--primary)]"
           >
             Create account
           </button>
@@ -223,26 +223,26 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto">
-      <div className="fixed inset-0 bg-black/70" onClick={onClose} />
+      <div className="fixed inset-0 bg-[var(--foreground)]/70" onClick={onClose} />
 
       <div className="relative min-h-screen flex items-center justify-center p-4">
-        <div className="relative bg-white w-full max-w-md rounded-lg shadow-2xl overflow-hidden">
+        <div className="relative bg-[var(--card)] w-full max-w-md rounded-lg shadow-2xl overflow-hidden">
           {/* Left black accent bar */}
-          <div className="absolute left-0 top-0 bottom-0 w-2 bg-black"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-2 bg-[var(--primary)]"></div>
 
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 text-gray-400 hover:text-black transition-colors duration-200"
+            className="absolute right-4 top-4 text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors duration-200"
           >
             <X size={20} />
           </button>
 
           <div className="px-8 pt-8 pb-6">
             <div className="mb-8 text-center">
-              <h2 className="text-3xl font-bold text-black">
+              <h2 className="text-3xl font-bold text-[var(--card-foreground)]">
                 {isLogin ? 'Welcome back' : 'Join us'}
               </h2>
-              <p className="text-gray-500 mt-2">
+              <p className="text-[var(--secondary)] mt-2">
                 {isLogin ? 'Sign in to continue to your account' : 'Create your account to get started'}
               </p>
             </div>
@@ -250,7 +250,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             {/* Google Login Button */}
             <button
               onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-md py-3 px-4 mb-6 font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-center gap-3 border border-[var(--border)] rounded-md py-3 px-4 mb-6 font-medium text-[var(--secondary)] hover:bg-[var(--neutral)] transition-colors"
               type="button"
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18" height="18">
@@ -263,19 +263,19 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             </button>
 
             <div className="flex items-center gap-3 my-6">
-              <div className="flex-1 h-px bg-gray-200"></div>
-              <span className="text-sm text-gray-500">or continue with email</span>
-              <div className="flex-1 h-px bg-gray-200"></div>
+              <div className="flex-1 h-px bg-[var(--border)]"></div>
+              <span className="text-sm text-[var(--secondary)]">or continue with email</span>
+              <div className="flex-1 h-px bg-[var(--border)]"></div>
             </div>
 
             {/* Render the appropriate form based on current auth mode */}
             {renderForm()}
           </div>
 
-          <div className="bg-gray-50 px-8 py-4 text-center">
+          <div className="bg-[var(--neutral)] px-8 py-4 text-center">
             <button
               type="button"
-              className="text-sm text-gray-600 hover:text-black transition-colors"
+              className="text-sm text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
               onClick={toggleAuthMode}
             >
               {isLogin ? "Don't have an account? " : 'Already have an account? '}
