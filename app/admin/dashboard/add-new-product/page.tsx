@@ -153,7 +153,7 @@ export default function AddNewProduct() {
               <input
                 type="text"
                 {...register("name")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                 placeholder="Enter product name"
               />
               {errors.name && (
@@ -174,7 +174,7 @@ export default function AddNewProduct() {
                     type="number"
                     step="0.01"
                     {...register("realPrice", { valueAsNumber: true })}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                     placeholder="0.00"
                   />
                 </div>
@@ -197,7 +197,7 @@ export default function AddNewProduct() {
                     type="number"
                     step="0.01"
                     {...register("discountedPrice", { valueAsNumber: true })}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                     placeholder="0.00"
                   />
                 </div>
@@ -215,7 +215,7 @@ export default function AddNewProduct() {
               </label>
               <select
                 {...register("category")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
               >
                 <option value="">Select category</option>
                 <option value="collections">Collections</option>
@@ -425,7 +425,7 @@ export default function AddNewProduct() {
               <textarea
                 {...register("shortDescription")}
                 rows={2}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                 placeholder="Brief description of the product"
               />
               {errors.shortDescription && (
@@ -442,7 +442,7 @@ export default function AddNewProduct() {
               <textarea
                 {...register("description")}
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                 placeholder="Detailed description of the product"
               />
               {errors.description && (
@@ -487,7 +487,7 @@ export default function AddNewProduct() {
                     <div className="flex-grow flex items-center space-x-4">
                       <select
                         {...register(`sizes.${index}.name`)}
-                        className="px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        className="px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                       >
                         {["S", "M", "L", "XL", "XXL"].map((size) => (
                           <option key={size} value={size}>
@@ -503,7 +503,7 @@ export default function AddNewProduct() {
                             valueAsNumber: true,
                           })}
                           placeholder="Stock quantity"
-                          className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                         />
                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
                           units
@@ -553,7 +553,7 @@ export default function AddNewProduct() {
                     <Tag size={14} className="text-gray-500 mr-2" />
                     <input
                       {...register(`tags.${index}.value`)}
-                      className="bg-transparent border-none focus:outline-none focus:ring-0 text-sm w-24"
+                      className="bg-transparent border-none focus:outline-none focus:ring-0 text-sm w-24 text-gray-900"
                       placeholder="Enter tag"
                     />
                     <button
@@ -576,13 +576,13 @@ export default function AddNewProduct() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Sidebar Navigation */}
-            <div className="md:w-64 bg-gray-50 p-6">
-              <h1 className="text-2xl font-bold text-gray-800 mb-8">
+            <div className="md:w-64 bg-gray-50 p-6 text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900 mb-8">
                 Add Product
               </h1>
 
@@ -592,19 +592,20 @@ export default function AddNewProduct() {
                   onClick={() => setActiveSection("basic")}
                   className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "basic"
                     ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-800 hover:bg-gray-100"
                     }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
                   Basic Information
                 </button>
 
+
                 <button
                   type="button"
                   onClick={() => setActiveSection("images")}
                   className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "images"
                     ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-800 hover:bg-gray-100"
                     }`}
                 >
                   <ImageIcon className="mr-3 h-5 w-5" />
@@ -616,7 +617,7 @@ export default function AddNewProduct() {
                   onClick={() => setActiveSection("descriptions")}
                   className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "descriptions"
                     ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-800 hover:bg-gray-100"
                     }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
@@ -628,7 +629,7 @@ export default function AddNewProduct() {
                   onClick={() => setActiveSection("inventory")}
                   className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "inventory"
                     ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-800 hover:bg-gray-100"
                     }`}
                 >
                   <Layers className="mr-3 h-5 w-5" />
@@ -640,7 +641,7 @@ export default function AddNewProduct() {
                   onClick={() => setActiveSection("tags")}
                   className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "tags"
                     ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    : "text-gray-800 hover:bg-gray-100"
                     }`}
                 >
                   <Tag className="mr-3 h-5 w-5" />
@@ -690,7 +691,7 @@ export default function AddNewProduct() {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 p-6 md:p-8">
+            <div className="flex-1 p-6 md:p-8 text-gray-900">
               <form onSubmit={handleSubmit(onSubmit)}>{renderSection()}</form>
             </div>
           </div>

@@ -264,7 +264,7 @@ export default function EditProduct() {
               <input
                 type="text"
                 {...register("name")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                 placeholder="Enter product name"
               />
               {errors.name && (
@@ -285,7 +285,7 @@ export default function EditProduct() {
                     type="number"
                     step="0.01"
                     {...register("realPrice", { valueAsNumber: true })}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                     placeholder="0.00"
                   />
                 </div>
@@ -308,7 +308,7 @@ export default function EditProduct() {
                     type="number"
                     step="0.01"
                     {...register("discountedPrice", { valueAsNumber: true })}
-                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                    className="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                     placeholder="0.00"
                   />
                 </div>
@@ -326,7 +326,7 @@ export default function EditProduct() {
               </label>
               <select
                 {...register("category")}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
               >
                 <option value="">Select category</option>
                 <option value="collections">Collections</option>
@@ -536,7 +536,7 @@ export default function EditProduct() {
               <textarea
                 {...register("shortDescription")}
                 rows={2}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                 placeholder="Brief description of the product"
               />
               {errors.shortDescription && (
@@ -553,7 +553,7 @@ export default function EditProduct() {
               <textarea
                 {...register("description")}
                 rows={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                 placeholder="Detailed description of the product"
               />
               {errors.description && (
@@ -598,7 +598,7 @@ export default function EditProduct() {
                     <div className="flex-grow flex items-center space-x-4">
                       <select
                         {...register(`sizes.${index}.name`)}
-                        className="px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        className="px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                       >
                         {["S", "M", "L", "XL", "XXL"].map((size) => (
                           <option key={size} value={size}>
@@ -614,7 +614,7 @@ export default function EditProduct() {
                             valueAsNumber: true,
                           })}
                           placeholder="Stock quantity"
-                          className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                          className="w-full pl-4 pr-10 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-gray-900"
                         />
                         <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
                           units
@@ -720,7 +720,7 @@ export default function EditProduct() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center text-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading product data...</p>
@@ -730,12 +730,12 @@ export default function EditProduct() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-white text-gray-900">
       <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Sidebar Navigation */}
-            <div className="md:w-64 bg-gray-50 p-6">
+            <div className="md:w-64 bg-white p-6 text-gray-900">
               <div className="flex items-center mb-8">
                 <button
                   onClick={() => router.push("/admin/dashboard")}
@@ -743,7 +743,7 @@ export default function EditProduct() {
                 >
                   <ArrowLeft size={20} />
                 </button>
-                <h1 className="text-2xl font-bold text-gray-800">
+                <h1 className="text-2xl font-bold text-gray-900">
                   Edit Product
                 </h1>
               </div>
@@ -752,58 +752,59 @@ export default function EditProduct() {
                 <button
                   type="button"
                   onClick={() => setActiveSection("basic")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "basic"
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    activeSection === "basic"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-800 hover:bg-gray-100"
+                  }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
                   Basic Information
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setActiveSection("images")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "images"
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    activeSection === "images"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-800 hover:bg-gray-100"
+                  }`}
                 >
                   <ImageIcon className="mr-3 h-5 w-5" />
                   Product Images
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setActiveSection("descriptions")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "descriptions"
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    activeSection === "descriptions"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-800 hover:bg-gray-100"
+                  }`}
                 >
                   <Layout className="mr-3 h-5 w-5" />
                   Descriptions
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setActiveSection("inventory")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "inventory"
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    activeSection === "inventory"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-800 hover:bg-gray-100"
+                  }`}
                 >
                   <Layers className="mr-3 h-5 w-5" />
                   Sizes & Inventory
                 </button>
-
                 <button
                   type="button"
                   onClick={() => setActiveSection("tags")}
-                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${activeSection === "tags"
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                  className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    activeSection === "tags"
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-gray-800 hover:bg-gray-100"
+                  }`}
                 >
                   <Tag className="mr-3 h-5 w-5" />
                   Tags
@@ -852,8 +853,10 @@ export default function EditProduct() {
             </div>
 
             {/* Content Area */}
-            <div className="flex-1 p-6 md:p-8">
-              <form onSubmit={handleSubmit(onSubmit)}>{renderSection()}</form>
+            <div className="flex-1 p-6 md:p-8 text-gray-900">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                {renderSection()}
+              </form>
             </div>
           </div>
         </div>
