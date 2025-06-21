@@ -133,12 +133,13 @@ export default function TshirtEcomNavbar() {
     await signOut({ redirect: false });
     toast.success('Logged out successfully');
   };
+
   if (!isMounted) {
     return (
       <div className="fixed top-0 left-0 right-0 z-50 bg-[var(--background)]">
-
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16">
+          {/* Desktop Layout - Unchanged */}
+          <div className="hidden lg:flex items-center justify-between h-16">
             <div className="block lg:hidden">
               <button className="text-[var(--foreground)] focus:outline-none">
                 <Menu size={24} />
@@ -184,6 +185,35 @@ export default function TshirtEcomNavbar() {
               <Link href="/cart" className="text-[var(--secondary)] relative"><ShoppingCart size={20} /></Link>
             </div>
           </div>
+
+          {/* Mobile Layout - Fixed */}
+          <div className="flex lg:hidden items-center h-16">
+            {/* Left side - Menu button */}
+            <div className="w-10 flex justify-start">
+              <button className="text-[var(--foreground)] focus:outline-none">
+                <Menu size={24} />
+              </button>
+            </div>
+
+            {/* Center - Brand name */}
+            <div className="flex-1 flex justify-center">
+              <Link href="/" className="text-xl font-extrabold text-[var(--foreground)] tracking-tighter">
+                UrbanThreadz
+              </Link>
+            </div>
+
+            {/* Right side - Cart with counter */}
+            <div className="w-10 flex justify-end">
+              <Link href="/cart" className="text-[var(--secondary)] relative">
+                <ShoppingCart size={20} />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -191,13 +221,14 @@ export default function TshirtEcomNavbar() {
 
   return (
     <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[var(--background)] shadow-md' : 'bg-[var(--background)]'}`}>
-
       <div className="container mx-auto px-4">
         <AuthModal
           isOpen={isAuthModalOpen}
           onClose={() => setIsAuthModalOpen(false)}
         />
-        <div className="flex items-center justify-between h-16">
+        
+        {/* Desktop Layout - Unchanged */}
+        <div className="hidden lg:flex items-center justify-between h-16">
           <div className="block lg:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -339,21 +370,28 @@ export default function TshirtEcomNavbar() {
                   </div>
                   <Link
                     href="/profile"
-                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] transition-colors"
                     onClick={() => setShowProfileMenu(false)}
                   >
-                    Your Profile
+                    Profile
                   </Link>
                   <Link
                     href="/orders"
-                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] transition-colors"
                     onClick={() => setShowProfileMenu(false)}
                   >
-                    Your Orders
+                    Orders
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] transition-colors"
+                    onClick={() => setShowProfileMenu(false)}
+                  >
+                    Settings
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[var(--neutral)]"
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[var(--neutral)] transition-colors"
                   >
                     Sign out
                   </button>
@@ -376,33 +414,72 @@ export default function TshirtEcomNavbar() {
             <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
           </div>
         </div>
+
+        {/* Mobile Layout - Fixed with proper alignment */}
+        <div className="flex lg:hidden items-center h-16">
+          {/* Left side - Menu button with fixed width */}
+          <div className="w-12 flex justify-start">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-[var(--foreground)] hover:text-[var(--secondary)] focus:outline-none transition-colors p-2"
+            >
+              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
+
+          {/* Center - Brand name perfectly centered */}
+          <div className="flex-1 flex justify-center">
+            <Link href="/" className="text-xl font-extrabold text-[var(--foreground)] tracking-tighter">
+              UrbanThreadz
+            </Link>
+          </div>
+
+          {/* Right side - Cart with fixed width to balance the layout */}
+          <div className="w-12 flex justify-end">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative p-2"
+            >
+              <ShoppingCart size={20} />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
+                  {cartItemCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Mobile Menu - Black and white theme */}
+      {/* Mobile Menu - Enhanced for better UX */}
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-[var(--background)] border-t border-[var(--border)] shadow-lg">
-          <div className="px-4 py-3">
+          {/* Search Section */}
+          <div className="px-4 py-3 border-b border-[var(--border)]">
             <div className="relative">
               <Search size={18} className="absolute left-3 top-2.5 text-[var(--secondary)]" />
               <input
                 type="text"
                 placeholder="Find your perfect tee..."
-                className="w-full border border-[var(--border)] rounded-none pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[var(--ring)] bg-transparent text-[var(--foreground)] placeholder:text-[var(--secondary)]"
+                className="w-full border border-[var(--border)] rounded-lg pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring)] bg-transparent text-[var(--foreground)] placeholder:text-[var(--secondary)]"
               />
             </div>
           </div>
-          <div className="border-t border-[var(--border)]">
+
+          {/* Navigation Categories */}
+          <div className="border-b border-[var(--border)]">
             {categories.map((category) => (
               <div key={category.id}>
-                <div className="flex items-center justify-between w-full px-4 py-3">
+                <div className="flex items-center justify-between w-full px-4 py-3 hover:bg-[var(--neutral)] transition-colors">
                   <Link
                     href={category.path}
-                    className="text-sm font-medium text-[var(--neutral-foreground)] hover:text-[var(--foreground)] transition-colors uppercase"
+                    className="text-sm font-medium text-[var(--neutral-foreground)] hover:text-[var(--foreground)] transition-colors uppercase tracking-wide"
+                    onClick={() => setIsMobileMenuOpen(false)}
                   >
                     {category.name}
                   </Link>
                   <button
-                    className="text-[var(--neutral-foreground)] hover:text-[var(--foreground)]"
+                    className="text-[var(--neutral-foreground)] hover:text-[var(--foreground)] p-1"
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveCategory(activeCategory === category.id ? null : category.id);
@@ -418,7 +495,7 @@ export default function TshirtEcomNavbar() {
                       <Link
                         key={idx}
                         href={`${category.path}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="block px-4 py-2 text-sm text-[var(--neutral-foreground)] hover:text-[var(--foreground)]"
+                        className="block px-4 py-2 text-sm text-[var(--neutral-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--background)] transition-colors"
                         onClick={() => {
                           setActiveCategory(null);
                           setIsMobileMenuOpen(false);
@@ -432,40 +509,48 @@ export default function TshirtEcomNavbar() {
               </div>
             ))}
           </div>
-          <div className="border-t border-gray-200 py-4 px-4 flex items-center space-x-6">
-            {/* Theme Toggle Button - Mobile */}
-            <button
-              onClick={() => {
-                toggleTheme();
-                setIsMobileMenuOpen(false); // Optionally close menu on theme change
-              }}
-              className="text-[var(--secondary)] hover:text-[var(--foreground)] focus:outline-none transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-            </button>
-            <button
-              type="button"
-              className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
-              onClick={() => {
-                if (status === "authenticated") {
-                  window.location.href = "/wishlist";
-                } else {
-                  setIsAuthModalOpen(true);
-                }
-              }}
-              aria-label="Wishlist"
-            >
-              <Heart size={20} /> 
-              {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
-            </button>
 
-            {/* Account - Mobile Menu Fix */}
-            <div className="relative profile-dropdown">
+          {/* Quick Actions */}
+          <div className="px-4 py-4">
+            <div className="flex items-center justify-around space-x-6">
+              {/* Theme Toggle */}
+              <button
+                onClick={() => {
+                  toggleTheme();
+                }}
+                className="flex flex-col items-center space-y-1 text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+                <span className="text-xs">Theme</span>
+              </button>
+
+              {/* Wishlist */}
+              <button
+                type="button"
+                className="flex flex-col items-center space-y-1 text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
+                onClick={() => {
+                  if (status === "authenticated") {
+                    window.location.href = "/wishlist";
+                  } else {
+                    setIsAuthModalOpen(true);
+                  }
+                  setIsMobileMenuOpen(false);
+                }}
+                aria-label="Wishlist"
+              >
+                <div className="relative">
+                  <Heart size={20} />
+                  {wishlistCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                      {wishlistCount}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs">Wishlist</span>
+              </button>
+
+              {/* Account */}
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -473,74 +558,95 @@ export default function TshirtEcomNavbar() {
                     setShowProfileMenu(!showProfileMenu);
                   } else {
                     setIsAuthModalOpen(true);
+                    setIsMobileMenuOpen(false);
                   }
                 }}
-                className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
+                className="flex flex-col items-center space-y-1 text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
               >
                 {status === "authenticated" && session?.user ? (
                   <Image
-                    src={session.user.image || "/default-avatar.png"}
+                    src={session.user.image || "https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg"}
                     alt={session.user.name || "User"}
                     className="rounded-full"
-                    width={32}
-                    height={32}
+                    width={20}
+                    height={20}
                   />
                 ) : (
                   <User size={20} />
                 )}
+                <span className="text-xs">Account</span>
               </button>
 
-              {/* Mobile Profile Dropdown */}
-              {showProfileMenu && status === "authenticated" && session?.user && (
-                <div className="absolute right-0 mt-2 w-48 bg-[var(--card)] shadow-lg rounded-md py-1 z-50 border border-[var(--border)]">
-                  <div className="px-4 py-3 border-b border-[var(--border)]">
-                    <p className="text-sm font-medium text-[var(--card-foreground)]">{session.user.name || "User"}</p>
-                    <p className="text-xs text-[var(--secondary)] truncate">{session.user.email || ""}</p>
-                  </div>
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
-                    onClick={() => {
-                      setShowProfileMenu(false);
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    Your Profile
-                  </Link>
-                  <Link
-                    href="/orders"
-                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)]"
-                    onClick={() => {
-                      setShowProfileMenu(false);
-                      setIsMobileMenuOpen(false);
-                    }}
-                  >
-                    Your Orders
-                  </Link>
-                  <button
-                    onClick={handleSignOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[var(--neutral)]"
-                  >
-                    Sign out
-                  </button>
+              {/* Cart */}
+              <button
+                onClick={() => {
+                  setIsCartOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="flex flex-col items-center space-y-1 text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
+              >
+                <div className="relative">
+                  <ShoppingCart size={20} />
+                  {cartItemCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
+                      {cartItemCount}
+                    </span>
+                  )}
                 </div>
-              )}
+                <span className="text-xs">Cart</span>
+              </button>
             </div>
-
-            {/* Cart */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="text-gray-700 hover:text-black transition-colors relative"
-            >
-              <ShoppingCart size={20} />
-              <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
-                3
-              </span>
-            </button>
           </div>
 
+          {/* Profile Menu for Mobile */}
+          {showProfileMenu && status === "authenticated" && session?.user && (
+            <div className="border-t border-[var(--border)] bg-[var(--card)]">
+              <div className="px-4 py-3 border-b border-[var(--border)]">
+                <p className="text-sm font-medium text-[var(--card-foreground)]">{session.user.name || "User"}</p>
+                <p className="text-xs text-[var(--secondary)] truncate">{session.user.email || ""}</p>
+              </div>
+              <Link
+                href="/profile"
+                className="block px-4 py-3 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] border-b border-[var(--border)] transition-colors"
+                onClick={() => {
+                  setShowProfileMenu(false);
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Profile
+              </Link>
+              <Link
+                href="/orders"
+                className="block px-4 py-3 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] border-b border-[var(--border)] transition-colors"
+                onClick={() => {
+                  setShowProfileMenu(false);
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Orders
+              </Link>
+              <Link
+                href="/settings"
+                className="block px-4 py-3 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] border-b border-[var(--border)] transition-colors"
+                onClick={() => {
+                  setShowProfileMenu(false);
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Settings
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-[var(--neutral)]"
+              >
+                Sign out
+              </button>
+            </div>
+          )}
         </div>
       )}
+
+      <Cart isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
       <Toaster />
     </div>
   );
