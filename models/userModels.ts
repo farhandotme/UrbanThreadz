@@ -4,6 +4,14 @@ interface User extends mongoose.Document {
   fullname: string;
   email: string;
   password: string;
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
   wishlist: mongoose.Types.ObjectId[];
   cart: {
     productId: mongoose.Types.ObjectId;
@@ -25,6 +33,32 @@ const userSchema = new mongoose.Schema<User>(
     password: {
       type: String,
       required: true,
+    },
+    phone: {
+      type: String,
+      default: "",
+    },
+    address: {
+      street: {
+        type: String,
+        default: "",
+      },
+      city: {
+        type: String,
+        default: "",
+      },
+      state: {
+        type: String,
+        default: "",
+      },
+      zipCode: {
+        type: String,
+        default: "",
+      },
+      country: {
+        type: String,
+        default: "",
+      },
     },
     wishlist: [
       {

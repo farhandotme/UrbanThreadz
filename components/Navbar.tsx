@@ -186,12 +186,12 @@ export default function TshirtEcomNavbar() {
             </div>
           </div>
 
-          {/* Mobile Layout - Fixed */}
+          {/* Mobile Layout - Loading State */}
           <div className="flex lg:hidden items-center h-16">
             {/* Left side - Menu button */}
-            <div className="w-10 flex justify-start">
-              <button className="text-[var(--foreground)] focus:outline-none">
-                <Menu size={24} />
+            <div className="w-12 flex justify-start">
+              <button className="text-[var(--foreground)] focus:outline-none p-2">
+                <Menu size={20} />
               </button>
             </div>
 
@@ -202,16 +202,14 @@ export default function TshirtEcomNavbar() {
               </Link>
             </div>
 
-            {/* Right side - Cart with counter */}
-            <div className="w-10 flex justify-end">
-              <Link href="/cart" className="text-[var(--secondary)] relative">
+            {/* Right side - Cart and User icons */}
+            <div className="flex items-center space-x-2">
+              <button className="text-[var(--secondary)] p-2">
                 <ShoppingCart size={20} />
-                {cartItemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
-                    {cartItemCount}
-                  </span>
-                )}
-              </Link>
+              </button>
+              <button className="text-[var(--secondary)] p-2">
+                <User size={20} />
+              </button>
             </div>
           </div>
         </div>
@@ -415,7 +413,7 @@ export default function TshirtEcomNavbar() {
           </div>
         </div>
 
-        {/* Mobile Layout - Fixed with proper alignment */}
+        {/* Mobile Layout - Updated with Both Cart and User Account */}
         <div className="flex lg:hidden items-center h-16">
           {/* Left side - Menu button with fixed width */}
           <div className="w-12 flex justify-start">
@@ -434,8 +432,9 @@ export default function TshirtEcomNavbar() {
             </Link>
           </div>
 
-          {/* Right side - Cart with fixed width to balance the layout */}
-          <div className="w-12 flex justify-end">
+          {/* Right side - Both Cart and User Account */}
+          <div className="flex items-center space-x-2">
+            {/* Cart Button */}
             <button
               onClick={() => setIsCartOpen(true)}
               className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative p-2"
@@ -447,6 +446,94 @@ export default function TshirtEcomNavbar() {
                 </span>
               )}
             </button>
+
+            {/* User Account */}
+            <div className="relative profile-dropdown">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (status === "authenticated") {
+                    setShowProfileMenu(!showProfileMenu);
+                  } else {
+                    setIsAuthModalOpen(true);
+                  }
+                }}
+                className="text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors p-2"
+              >
+                {status === "authenticated" && session?.user ? (
+                  <Image
+                    src={session.user.image || "https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg"}
+                    alt={session.user.name || "User"}
+                    className="rounded-full"
+                    width={20}
+                    height={20}
+                  />
+                ) : (
+                  <User size={20} />
+                )}
+              </button>
+
+              {/* Mobile Profile Dropdown Menu */}
+              {showProfileMenu && status === "authenticated" && session?.user && (
+                <div className="absolute right-0 mt-2 w-48 bg-[var(--card)] shadow-lg rounded-md py-1 z-50 border border-[var(--border)]">
+                  <div className="px-4 py-3 border-b border-[var(--border)]">
+                    <p className="text-sm font-medium text-[var(--card-foreground)]">{session.user.name || "User"}</p>
+                    <p className="text-xs text-[var(--secondary)] truncate">{session.user.email || ""}</p>
+                  </div>
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] transition-colors"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Profile
+                  </Link>
+                  <Link
+                    href="/orders"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] transition-colors"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Orders
+                  </Link>
+                  <Link
+                    href="/settings"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] transition-colors"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Settings
+                  </Link>
+                  <Link
+                    href="/wishlist"
+                    className="block px-4 py-2 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] transition-colors"
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Wishlist
+                    {wishlistCount > 0 && (
+                      <span className="ml-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full px-1.5 py-0.5">
+                        {wishlistCount}
+                      </span>
+                    )}
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[var(--neutral)] transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -549,100 +636,8 @@ export default function TshirtEcomNavbar() {
                 </div>
                 <span className="text-xs">Wishlist</span>
               </button>
-
-              {/* Account */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (status === "authenticated" && session?.user) {
-                    setShowProfileMenu(!showProfileMenu);
-                  } else {
-                    setIsAuthModalOpen(true);
-                    setIsMobileMenuOpen(false);
-                  }
-                }}
-                className="flex flex-col items-center space-y-1 text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors"
-              >
-                {status === "authenticated" && session?.user ? (
-                  <Image
-                    src={session.user.image || "https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg"}
-                    alt={session.user.name || "User"}
-                    className="rounded-full"
-                    width={20}
-                    height={20}
-                  />
-                ) : (
-                  <User size={20} />
-                )}
-                <span className="text-xs">Account</span>
-              </button>
-
-              {/* Cart */}
-              <button
-                onClick={() => {
-                  setIsCartOpen(true);
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex flex-col items-center space-y-1 text-[var(--secondary)] hover:text-[var(--foreground)] transition-colors relative"
-              >
-                <div className="relative">
-                  <ShoppingCart size={20} />
-                  {cartItemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-[var(--foreground)] text-[var(--background)] text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
-                      {cartItemCount}
-                    </span>
-                  )}
-                </div>
-                <span className="text-xs">Cart</span>
-              </button>
             </div>
           </div>
-
-          {/* Profile Menu for Mobile */}
-          {showProfileMenu && status === "authenticated" && session?.user && (
-            <div className="border-t border-[var(--border)] bg-[var(--card)]">
-              <div className="px-4 py-3 border-b border-[var(--border)]">
-                <p className="text-sm font-medium text-[var(--card-foreground)]">{session.user.name || "User"}</p>
-                <p className="text-xs text-[var(--secondary)] truncate">{session.user.email || ""}</p>
-              </div>
-              <Link
-                href="/profile"
-                className="block px-4 py-3 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] border-b border-[var(--border)] transition-colors"
-                onClick={() => {
-                  setShowProfileMenu(false);
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Profile
-              </Link>
-              <Link
-                href="/orders"
-                className="block px-4 py-3 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] border-b border-[var(--border)] transition-colors"
-                onClick={() => {
-                  setShowProfileMenu(false);
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Orders
-              </Link>
-              <Link
-                href="/settings"
-                className="block px-4 py-3 text-sm text-[var(--card-foreground)] hover:bg-[var(--neutral)] border-b border-[var(--border)] transition-colors"
-                onClick={() => {
-                  setShowProfileMenu(false);
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Settings
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="block w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-[var(--neutral)]"
-              >
-                Sign out
-              </button>
-            </div>
-          )}
         </div>
       )}
 
