@@ -14,6 +14,7 @@ const addressSchema = z.object({
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
   zipCode: z.string().min(1, "ZIP code is required"),
+  landmark: z.string().optional(),
   country: z.string().min(1, "Country is required"),
 });
 
@@ -287,6 +288,13 @@ const ProfilePage = () => {
                       placeholder="123 Main Street, Apt 4B"
                     />
                     
+                    <FormField
+                      label="Landmark"
+                      name="address.landmark"
+                      error={errors.address?.landmark?.message}
+                      placeholder="Near Central Park, Behind Shopping Mall, etc."
+                    />
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         label="City"
@@ -312,13 +320,21 @@ const ProfilePage = () => {
                         error={errors.address?.zipCode?.message}
                         placeholder="10001"
                       />
-                      <FormField
-                        label="Country"
-                        name="address.country"
-                        required
-                        error={errors.address?.country?.message}
-                        placeholder="United States"
-                      />
+                      <div className="group">
+                        <label className="block text-sm font-medium mb-2 text-black dark:text-white transition-colors duration-200">
+                          Country <span className="text-red-500 ml-1">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value="India"
+                          disabled
+                          className="w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 
+                            bg-gray-100 dark:bg-gray-800 
+                            text-gray-700 dark:text-gray-300 
+                            border-gray-200 dark:border-gray-700
+                            cursor-not-allowed"
+                        />
+                      </div>
                     </div>
                   </div>
                 </section>

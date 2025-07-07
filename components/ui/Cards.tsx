@@ -7,6 +7,8 @@ import { useSession } from "next-auth/react"
 import axios from "axios"
 import { useAuthAction } from "@/components/AuthActionContext"
 import { toast } from "sonner"
+// import { useRouter } from 'next/router';
+import Link from "next/link"
 
 interface ProductImage {
   url: string
@@ -42,6 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [showDetails, setShowDetails] = useState(false)
+  // const router = useRouter();
 
   useEffect(() => {
     async function fetchWishlistStatus() {
@@ -64,7 +67,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const handleWishlist = async () => {
     if (!session) {
-      runOrQueueAction(() => {})
+      runOrQueueAction(() => { })
       toast.error("Please sign in to use wishlist")
       return
     }
@@ -101,22 +104,6 @@ export default function ProductCard({ product }: { product: Product }) {
     })
   }
 
-  const handleBuyNow = () => {
-    runOrQueueAction(async () => {
-      try {
-        await axios.post("/api/users/cart", { productId: product._id })
-        toast.success("Item added to cart!")
-        window.location.href = "/cart"
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          toast.error("Please sign in to add items to cart")
-        } else {
-          const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-          toast.error(`Failed to add to cart: ${errorMessage}`)
-        }
-      }
-    })
-  }
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -206,13 +193,21 @@ export default function ProductCard({ product }: { product: Product }) {
                 className={`w-6 h-6 ${isWishlisted ? "fill-[var(--foreground)] text-[var(--foreground)] animate-pulse" : "text-[var(--secondary)]"} transition-all`}
               />
             </button>
-            <button
-              className="flex-1 bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-2 rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-xs font-semibold shadow disabled:opacity-60 disabled:cursor-not-allowed"
-              disabled={!product.isAvailable || product.totalStock === 0}
-              onClick={handleBuyNow}
+            <Link
+              href={product.isAvailable && product.totalStock > 0 ? `/productDetails/${product._id}` : "#"}
+              onClick={(e) => {
+                if (!product.isAvailable || product.totalStock === 0) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
+              className={`flex-1 bg-[var(--primary)] text-[var(--primary-foreground)] px-3 py-4 rounded-lg hover:bg-[var(--primary)]/90 transition-colors text-xs font-semibold shadow text-center  ${!product.isAvailable || product.totalStock === 0
+                ? 'opacity-60 cursor-not-allowed hover:bg-[var(--primary)]'
+                : ''
+                }`}
             >
-              Buy Now
-            </button>
+              View
+            </Link>
             <button
               className="p-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--neutral)] transition-colors"
               aria-label="Add to cart"
