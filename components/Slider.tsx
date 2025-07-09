@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, TouchEvent } from 'react'
 import Image from 'next/image'
-import { ChevronLeft, ChevronRight, Circle, CircleDot } from 'lucide-react'
 
 interface Slide {
   id: number
@@ -42,6 +41,7 @@ const slides: Slide[] = [
 export default function ProductSlider() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
 
   const nextSlide = () => {
     if (isAnimating) return
@@ -62,62 +62,55 @@ export default function ProductSlider() {
     return () => clearInterval(timer)
   }, [])
 
+  const handleTouchStart = (e: TouchEvent) => {
+    setTouchStart(e.touches[0].clientX)
+  }
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    if (!touchStart) return
+    const touchEnd = e.changedTouches[0].clientX
+    const diff = touchStart - touchEnd
+
+    if (Math.abs(diff) > 50) { // minimum swipe distance
+      if (diff > 0) {
+        nextSlide()
+      } else {
+        prevSlide()
+      }
+    }
+    setTouchStart(null)
+  }
+
   return (
-    <div className="relative h-[600px] w-full overflow-hidden rounded-xl">
-      {/* Slides */}
+    <div
+      className="relative h-[380px] xs:h-[420px] sm:h-[460px] md:h-[600px] w-full overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-gray-900/60 to-gray-700/40"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       {slides.map((slide, index) => (
         <div
           key={slide.id}
-          className={`absolute inset-0 transition-transform duration-500 ease-in-out ${
-            index === currentSlide
-              ? 'translate-x-0'
-              : index < currentSlide
-              ? '-translate-x-full'
-              : 'translate-x-full'
-          }`}
+          className={`absolute inset-0 transition-transform duration-500 ease-in-out ${index === currentSlide
+            ? 'translate-x-0 z-10'
+            : index < currentSlide
+              ? '-translate-x-full z-0'
+              : 'translate-x-full z-0'
+            }`}
         >
           <Image
             src={slide.image}
             alt={slide.title}
             fill
-            className="object-cover"
+            className={`object-cover transition-transform duration-700 ${index === currentSlide ? 'scale-105' : 'scale-100'
+              }`}
             priority={index === 0}
           />
-          {/* Content Overlay */}
-          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-            <div className="text-center text-white space-y-4 px-4">
-              <h2 className="text-4xl md:text-6xl font-bold tracking-tight">
-                {slide.title}
-              </h2>
-              <p className="text-lg md:text-xl">
-                {slide.description}
-              </p>
-              <button className="mt-4 px-6 py-2 bg-white text-black font-medium hover:bg-white/90 transition-colors">
-                Shop Now
-              </button>
-            </div>
-          </div>
+          <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/70 to-transparent pointer-events-none rounded-b-2xl" />
+
         </div>
       ))}
 
-      {/* Navigation Buttons */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-        disabled={isAnimating}
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-        disabled={isAnimating}
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-
-      {/* Dots Navigation */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-6 sm:bottom-8 md:bottom-8 left-1/2 -translate-x-1/2 flex space-x-3 sm:space-x-4 md:space-x-4 z-20">
         {slides.map((_, index) => (
           <button
             key={index}
@@ -128,13 +121,12 @@ export default function ProductSlider() {
                 setTimeout(() => setIsAnimating(false), 500)
               }
             }}
-            className="p-1 hover:opacity-75 transition-opacity"
+            className={`transition-all duration-200 rounded-full border border-white/40 shadow
+              ${index === currentSlide ? 'bg-white/90 scale-110' : 'bg-white/40'}
+              w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 flex items-center justify-center`}
+            aria-label={`Go to slide ${index + 1}`}
           >
-            {index === currentSlide ? (
-              <CircleDot className="w-4 h-4 text-white" />
-            ) : (
-              <Circle className="w-4 h-4 text-white" />
-            )}
+            <span className={`block rounded-full ${index === currentSlide ? 'bg-black w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3' : 'bg-black/40 w-1.5 h-1.5 sm:w-2 sm:h-2 md:w-2.5 md:h-2.5'}`}></span>
           </button>
         ))}
       </div>
