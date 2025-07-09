@@ -206,7 +206,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 : ''
                 }`}
             >
-              View
+              Buy Now
             </Link>
             <button
               className="p-2 rounded-lg border border-[var(--border)] bg-[var(--card)] hover:bg-[var(--neutral)] transition-colors"
