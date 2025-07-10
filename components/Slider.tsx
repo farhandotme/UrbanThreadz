@@ -56,22 +56,18 @@ export default function ProductSlider() {
     setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1))
     setTimeout(() => setIsAnimating(false), 500)
   }
-
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000)
     return () => clearInterval(timer)
   }, [])
-
   const handleTouchStart = (e: TouchEvent) => {
     setTouchStart(e.touches[0].clientX)
   }
-
   const handleTouchEnd = (e: TouchEvent) => {
     if (!touchStart) return
     const touchEnd = e.changedTouches[0].clientX
     const diff = touchStart - touchEnd
-
-    if (Math.abs(diff) > 50) { // minimum swipe distance
+    if (Math.abs(diff) > 50) {
       if (diff > 0) {
         nextSlide()
       } else {
@@ -80,7 +76,6 @@ export default function ProductSlider() {
     }
     setTouchStart(null)
   }
-
   return (
     <div
       className="relative h-[380px] xs:h-[420px] sm:h-[460px] md:h-[600px] w-full overflow-hidden rounded-2xl shadow-xl bg-gradient-to-br from-gray-900/60 to-gray-700/40"

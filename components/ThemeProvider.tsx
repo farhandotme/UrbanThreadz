@@ -22,10 +22,9 @@ interface ThemeProviderProps {
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-  const [theme, setTheme] = useState('light'); // Default theme
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    // Check for saved theme in localStorage or system preference
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     if (savedTheme) {

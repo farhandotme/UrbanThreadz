@@ -109,7 +109,7 @@ export default function ProductCard({ product }: { product: Product }) {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ scale: 1.04, boxShadow: "0 8px 32px rgba(0,0,0,0.10)" }}
-      className="group relative bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-md transition-all duration-300 p-2 sm:p-3 overflow-hidden h-[380px] sm:h-[400px] w-full max-w-[280px] sm:max-w-[380px] mx-auto flex flex-col hover:z-20"
+      className="group relative bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-md transition-all duration-300 p-1 sm:p-3 overflow-hidden h-[380px] sm:h-[400px] w-full max-w-[280px] sm:max-w-[380px] mx-auto flex flex-col hover:z-20"
       onMouseEnter={() => setShowDetails(true)}
       onMouseLeave={() => setShowDetails(false)}
     >
@@ -129,12 +129,31 @@ export default function ProductCard({ product }: { product: Product }) {
         )}
       </div>
       {/* Content */}
-      <div className="flex-1 flex flex-col justify-between min-h-0">
+      <div className="flex-1 flex flex-col justify-between">
         <div className="overflow-hidden">
           <h2 className="text-sm sm:text-base font-semibold text-[var(--card-foreground)] mb-1 line-clamp-1 tracking-tight">
             {product.name}
           </h2>
           <p className="text-xs text-[var(--secondary)] mb-1 line-clamp-2">{product.shortDescription}</p>
+          
+          {/* Sizes Display - Mobile View */}
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-2 sm:hidden">
+              {product.sizes.slice(0, 4).map((size) => (
+                <span 
+                  key={size.name} 
+                  className="px-2 py-0.5 bg-[var(--neutral)] text-[var(--neutral-foreground)] text-xs rounded border border-[var(--border)] font-medium"
+                >
+                  {size.name}
+                </span>
+              ))}
+              {product.sizes.length > 4 && (
+                <span className="px-2 py-0.5 bg-[var(--neutral)] text-[var(--neutral-foreground)] text-xs rounded border border-[var(--border)] font-medium">
+                  +{product.sizes.length - 4}
+                </span>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex items-end gap-2 mt-1">
           <span className="text-base sm:text-lg font-bold text-[var(--card-foreground)]">
@@ -164,7 +183,7 @@ export default function ProductCard({ product }: { product: Product }) {
         className={`absolute inset-0 bg-[var(--card)]/95 rounded-xl p-4 flex flex-col justify-between z-20 group-hover:shadow-2xl ${showDetails ? "pointer-events-auto" : "pointer-events-none"}`}
         style={{ backdropFilter: "blur(2px)" }}
       >
-        <div className="w-full flex-1 flex flex-col mt-10 justify-between">
+        <div className="w-full flex-1 flex flex-col mt-1 justify-between">
           <div>
             <h3 className="text-lg font-bold text-[var(--card-foreground)] mb-2 text-center">{product.name}</h3>
             <p className="text-sm text-[var(--secondary)] mb-2 text-center line-clamp-4">{product.description}</p>
@@ -184,8 +203,9 @@ export default function ProductCard({ product }: { product: Product }) {
             </div>
           </div>
           <div className="flex gap-2 w-full justify-center mt-auto pt-2">
+            {/* Wishlist button - Desktop only */}
             <button
-              className={`p-2 rounded-full border border-[var(--border)] bg-[var(--card)]/80 hover:bg-[var(--neutral)] transition-colors ${loading ? "opacity-60 pointer-events-none" : ""}`}
+              className={`hidden sm:block p-2 rounded-full border border-[var(--border)] bg-[var(--card)]/80 hover:bg-[var(--neutral)] transition-colors ${loading ? "opacity-60 pointer-events-none" : ""}`}
               aria-label="Add to wishlist"
               onClick={handleWishlist}
             >
@@ -282,7 +302,7 @@ export function ProductsGrid({ heading, products }: { heading?: string; products
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-4 justify-items-center px-2 sm:px-0">
+    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 justify-items-center sm:px-0">
       {displayProducts.map((product) => (
         <ProductCard key={product._id} product={product} />
       ))}
