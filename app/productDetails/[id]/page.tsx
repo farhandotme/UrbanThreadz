@@ -1,13 +1,10 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { Heart, ShoppingCart, ChevronLeft, ChevronRight, Star, Tag } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuthAction } from "@/components/AuthActionContext";
-import { useTheme } from "@/components/ThemeProvider";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -46,8 +43,6 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   const { id } = React.use(params);
   const router = useRouter();
   const { data: session } = useSession();
-  const { runOrQueueAction } = useAuthAction();
-  const { theme, toggleTheme } = useTheme();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -78,8 +73,8 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
           const { data } = await axios.get("/api/users/wishlistProducts");
           // data.products is the array of wishlisted products
           const wishlistItems = Array.isArray(data.products) ? data.products : [];
-          setIsWishlisted(wishlistItems.some((item: any) => item._id === id));
-        } catch (e) {
+          setIsWishlisted(wishlistItems.some((item: WishlistItem) => item._id === id));
+        } catch {
           setIsWishlisted(false);
         }
       }
@@ -115,22 +110,22 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   };
 
   // Cart and wishlist actions
-  const handleAddToCart = async () => {
-    if (!session) {
-      toast.error("Please sign in to add to cart");
-      return;
-    }
-    if (!selectedSize) {
-      toast.error("Please select a size");
-      return;
-    }
-    try {
-      await axios.post("/api/users/cart", { productId: id, quantity, size: selectedSize });
-      toast.success("Added to cart!");
-    } catch (error) {
-      toast.error("Failed to add to cart");
-    }
-  };
+  // const handleAddToCart = async () => {
+  //   if (!session) {
+  //     toast.error("Please sign in to add to cart");
+  //     return;
+  //   }
+  //   if (!selectedSize) {
+  //     toast.error("Please select a size");
+  //     return;
+  //   }
+  //   try {
+  //     await axios.post("/api/users/cart", { productId: id, quantity, size: selectedSize });
+  //     toast.success("Added to cart!");
+  //   } catch {
+  //     toast.error("Failed to add to cart");
+  //   }
+  // };
   const handleWishlist = async () => {
     if (!session) {
       toast.error("Please sign in to use wishlist");
@@ -146,7 +141,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         setIsWishlisted(true);
         toast.success("Added to wishlist");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to update wishlist");
     }
   };
@@ -230,11 +225,10 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                       setTimeout(() => setIsSliding(false), 300);
                     }
                   }}
-                  className={`w-2 h-2 rounded-full transition-all duration-200 ${
-                    currentImageIndex === index
-                      ? "bg-[var(--foreground)] w-4"
-                      : "bg-[var(--border)] hover:bg-[var(--foreground)]"
-                  }`}
+                  className={`w-2 h-2 rounded-full transition-all duration-200 ${currentImageIndex === index
+                    ? "bg-[var(--foreground)] w-4"
+                    : "bg-[var(--border)] hover:bg-[var(--foreground)]"
+                    }`}
                   aria-label={`Go to image ${index + 1}`}
                 />
               ))}
@@ -272,11 +266,10 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                       setTimeout(() => setIsSliding(false), 300);
                     }
                   }}
-                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                    currentImageIndex === index
-                      ? "border-[var(--foreground)] scale-95"
-                      : "border-[var(--border)] hover:border-[var(--foreground)]"
-                  }`}
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${currentImageIndex === index
+                    ? "border-[var(--foreground)] scale-95"
+                    : "border-[var(--border)] hover:border-[var(--foreground)]"
+                    }`}
                   aria-label={`View image ${index + 1}`}
                 >
                   <div className="relative w-full h-full">
@@ -347,11 +340,10 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                   <button
                     key={size.name}
                     onClick={() => setSelectedSize(size.name)}
-                    className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg border-2 transition-all duration-200 text-sm font-semibold ${
-                      selectedSize === size.name
-                        ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
-                        : "border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] hover:border-[var(--foreground)]"
-                    }`}
+                    className={`px-3 py-2 sm:px-4 sm:py-2 rounded-lg border-2 transition-all duration-200 text-sm font-semibold ${selectedSize === size.name
+                      ? "border-[var(--foreground)] bg-[var(--foreground)] text-[var(--background)]"
+                      : "border-[var(--border)] bg-[var(--card)] text-[var(--card-foreground)] hover:border-[var(--foreground)]"
+                      }`}
                   >
                     {size.name}
                     {size.stock < 5 && (
@@ -388,9 +380,44 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
             <button
               onClick={async () => {
                 if (!product.isAvailable || product.totalStock === 0) return;
-                await handleAddToCart();
-                // Redirect to cart after adding
-                window.location.href = "/cart";
+                if (!session) {
+                  toast.error("Please sign in to buy");
+                  return;
+                }
+                if (!selectedSize) {
+                  toast.error("Please select a size");
+                  return;
+                }
+                try {
+                  const orderPayload = {
+                    orderItems: [
+                      {
+                        product: product._id,
+                        name: product.name,
+                        quantity,
+                        price: product.discountedPrice,
+                        size: selectedSize,
+                      },
+                    ],
+                    shippingAddress: {
+                      street: "",
+                      city: "",
+                      state: "",
+                      zipCode: "",
+                      country: "",
+                    },
+                    paymentMethod: "COD",
+                    itemsPrice: product.discountedPrice * quantity,
+                    taxPrice: 0,
+                    shippingPrice: 0,
+                    totalPrice: product.discountedPrice * quantity,
+                  };
+                  await axios.post("/api/orders", orderPayload);
+                  toast.success("Order placed!");
+                  window.location.href = "/profile"; // or /orders if you have an orders page
+                } catch {
+                  toast.error("Failed to place order");
+                }
               }}
               disabled={!product.isAvailable || product.totalStock === 0}
               className="flex-1 py-3 sm:py-4 px-4 sm:px-6 bg-[var(--primary)] text-[var(--primary-foreground)] rounded-xl font-semibold transition duration-200 hover:bg-[var(--primary)]/90 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-[var(--primary)]/20 focus:ring-offset-2 flex items-center justify-center gap-2"
@@ -400,11 +427,10 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
             </button>
             <button
               onClick={handleWishlist}
-              className={`flex-1 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold border-2 transition duration-200 flex items-center justify-center gap-2 ${
-                isWishlisted
-                  ? "border-red-500 text-red-500 bg-red-50 hover:bg-red-100"
-                  : "border-[var(--border)] text-[var(--foreground)] bg-[var(--card)] hover:bg-[var(--neutral)]"
-              }`}
+              className={`flex-1 py-3 sm:py-4 px-4 sm:px-6 rounded-xl font-semibold border-2 transition duration-200 flex items-center justify-center gap-2 ${isWishlisted
+                ? "border-red-500 text-red-500 bg-red-50 hover:bg-red-100"
+                : "border-[var(--border)] text-[var(--foreground)] bg-[var(--card)] hover:bg-[var(--neutral)]"
+                }`}
             >
               <Heart className={isWishlisted ? "fill-current" : ""} size={18} />
               {isWishlisted ? "Wishlisted" : "Add to Wishlist"}

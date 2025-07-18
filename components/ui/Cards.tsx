@@ -7,7 +7,6 @@ import { useSession } from "next-auth/react"
 import axios from "axios"
 import { useAuthAction } from "@/components/AuthActionContext"
 import { toast } from "sonner"
-// import { useRouter } from 'next/router';
 import Link from "next/link"
 
 interface ProductImage {
@@ -75,7 +74,6 @@ export default function ProductCard({ product }: { product: Product }) {
     try {
       const res = await axios.post("/api/users/wishlist", { productId: product._id })
       if (res.status === 200) {
-        // Re-fetch wishlist status to ensure correct state (handles Google login edge case)
         const check = await axios.get("/api/users/wishlist", { params: { productId: product._id } })
         setIsWishlisted(check.data.isWishlisted)
         toast.success(check.data.isWishlisted ? "Added to wishlist" : "Removed from wishlist")
@@ -174,7 +172,6 @@ export default function ProductCard({ product }: { product: Product }) {
           <div className="mt-1 text-xs font-semibold text-red-600">Out of Stock</div>
         ) : null}
       </div>
-
       {/* Animated Actions on Hover */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -294,7 +291,6 @@ export function ProductsGrid({ heading, products }: { heading?: string; products
 
   let displayProducts = internalProducts
   if (heading) {
-    // Filter products by category matching heading (case-insensitive)
     const filtered = internalProducts.filter((p) => p.category?.toLowerCase() === heading.toLowerCase())
     displayProducts = filtered.slice(0, 7)
     if (!displayProducts.length)

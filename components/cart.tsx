@@ -21,6 +21,7 @@ interface CartItem {
   isAvailable: boolean;
   totalStock: number;
   quantity: number;
+  size?: string;
 }
 
 const Cart = ({ isOpen, onClose }: CartProps) => {
@@ -152,14 +153,8 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
     }, 0);
   };
 
-  const handleCheckout = async () => {
-    try {
-      // TODO: Implement checkout logic
-      toast.success('Redirecting to checkout...');
-    } catch (error: Error | unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      toast.error(`Failed to proceed to checkout: ${errorMessage}`);
-    }
+  const handleCheckout = () => {
+    window.location.href = '/checkout';
   };
 
   return (
