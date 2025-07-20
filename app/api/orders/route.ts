@@ -3,7 +3,6 @@ import OrderModel from "@/models/orderModel";
 import { connectDB } from "@/DB/dbConfig";
 import { getDataFromToken } from "@/utils/getDataFromToken";
 
-// GET: Get all orders for the authenticated user
 export async function GET() {
   await connectDB();
   const tokenPayload = await getDataFromToken();
@@ -23,7 +22,6 @@ export async function GET() {
   }
 }
 
-// POST: Create a new order
 export async function POST(req: NextRequest) {
   await connectDB();
   const tokenPayload = await getDataFromToken();

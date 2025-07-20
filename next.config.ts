@@ -11,6 +11,7 @@ const nextConfig = {
       'lh3.googleusercontent.com',  // For Google authentication profile pictures
       'avatars.githubusercontent.com',  // For GitHub profile pictures (if you add GitHub auth)
       'www.svgrepo.com',  // For default avatar SVG
+      'images.unsplash.com',  // For Unsplash images
     ],
     remotePatterns: [
       {
