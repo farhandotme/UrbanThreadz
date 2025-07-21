@@ -37,23 +37,26 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
 
     setLoading(true);
     try {
-      const response = await axios.get('/api/users/cart', {
-        withCredentials: true,
-        headers: {
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      // Validate response data
+      const response = await axios.get('/api/users/cart');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Cart API response:', response.data);
+      }
+      let items: CartItem[] = [];
       if (Array.isArray(response.data)) {
-        const validItems = response.data.filter(item => 
-          item && typeof item === 'object' && 
+        items = response.data;
+      } else if (response.data && Array.isArray(response.data.cart)) {
+        items = response.data.cart;
+      }
+      if (Array.isArray(items)) {
+        const validItems = items.filter(item =>
+          item && typeof item === 'object' &&
           item._id && item.name && Array.isArray(item.images)
         );
         setCartItems(validItems);
       } else {
         setCartItems([]);
         console.error('Invalid cart data received:', response.data);
+        toast.error('Cart data format error.');
       }
     } catch (error) {
       setCartItems([]);
@@ -61,15 +64,18 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
         if (error.response?.status === 401) {
           toast.error('Please sign in to view your cart');
         } else if (error.response?.status === 500 && retry) {
-          // Retry once on 500 error
           console.log('Retrying cart fetch...');
           setTimeout(() => fetchCartItems(false), 1000);
           return;
         } else {
           toast.error('Failed to load cart items. Please try again.');
+          if (error.response) {
+            console.error('Cart API error response:', error.response.data);
+          }
         }
       } else {
         toast.error('An unexpected error occurred');
+        console.error('Cart fetch error:', error);
       }
     } finally {
       setLoading(false);
@@ -128,7 +134,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
         data: { productId },
         withCredentials: true // Include credentials in the request
       });
-      
+
       if (response.data.success) {
         setCartItems(prev => prev.filter(item => item._id !== productId));
         toast.success('Item removed from cart');
@@ -198,7 +204,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                                 <div key={i} className="flex py-6 animate-pulse">
                                   {/* Product image skeleton */}
                                   <div className="h-24 w-24 flex-shrink-0 rounded-md bg-[var(--neutral)]" />
-                                  
+
                                   <div className="ml-4 flex flex-1 flex-col">
                                     {/* Product details skeleton */}
                                     <div className="flex justify-between mb-4">
@@ -208,7 +214,7 @@ const Cart = ({ isOpen, onClose }: CartProps) => {
                                       </div>
                                       <div className="h-4 w-16 bg-[var(--neutral)] rounded ml-4" />
                                     </div>
-                                    
+
                                     {/* Actions skeleton */}
                                     <div className="flex items-end justify-between mt-auto">
                                       <div className="flex items-center space-x-2">

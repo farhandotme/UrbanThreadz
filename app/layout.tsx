@@ -1,5 +1,4 @@
 "use client"
-import type { Metadata } from "next";
 import "./globals.css";
 import SessionWrapper from "@/components/SessionWrapper";
 import { AuthActionProvider } from "@/components/AuthActionContext";

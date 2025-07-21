@@ -48,7 +48,6 @@ const ProfilePage = () => {
     handleSubmit,
     reset,
     formState: { errors, isDirty, isSubmitting },
-    setValue,
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -102,7 +101,7 @@ const ProfilePage = () => {
       });
       toast.success("Profile updated successfully");
       reset(response.data);
-    } catch (error) {
+    } catch  {
       toast.error("Failed to update profile");
     }
   };
@@ -114,28 +113,30 @@ const ProfilePage = () => {
       await axios.delete("/api/users/profile");
       toast.success("Account deleted successfully");
       await signOut({ callbackUrl: "/" });
-    } catch (error) {
+    } catch  {
       toast.error("Failed to delete account");
     } finally {
       setDeleting(false);
     }
   };
 
-  const FormField = ({ 
-    label, 
-    name, 
-    type = "text",
-    required = false,
-    error = "",
-    placeholder = "",
-  }: { 
+  type FormFieldProps<T> = {
     label: string;
-    name: string;
+    name: T;
     type?: string;
     required?: boolean;
     error?: string;
     placeholder?: string;
-  }) => (
+  };
+
+  const FormField = <T extends keyof ProfileFormData | `address.${keyof ProfileFormData['address']}`>({
+    label,
+    name,
+    type = "text",
+    required = false,
+    error = "",
+    placeholder = "",
+  }: FormFieldProps<T>) => (
     <div className="group">
       <label className="block text-sm font-medium mb-2 text-black dark:text-white transition-colors duration-200">
         {label} {required && <span className="text-red-500 ml-1">*</span>}
@@ -143,7 +144,7 @@ const ProfilePage = () => {
       <input
         type={type}
         placeholder={placeholder}
-        {...register(name as any)}
+        {...register(name as T)}
         className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 
           bg-white dark:bg-black 
           text-black dark:text-white 
