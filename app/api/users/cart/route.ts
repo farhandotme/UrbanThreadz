@@ -3,6 +3,7 @@ import { connectDB } from "@/DB/dbConfig";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import userModels from "@/models/userModels";
+import ProductModel from "@/models/productModels";
 
 interface CartProduct {
   _id: string;
